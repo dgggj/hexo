@@ -1,0 +1,720 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Stream流式编程 | 牧羊少年的代码之旅</title><meta name="keywords" content="java,Stream"><meta name="author" content="chy_lua"><meta name="copyright" content="chy_lua"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="概要stream是用于对迭代器的增强，使之完成更高效的聚合操作（过滤，排序，统计分组）或者大批量数据操作。 stream和lambada表示结合后会大大提升编程效率。 通过将集合转换为这么一种叫做 “流” 的元素序列，通过声明性方式，能够对集合中的每个元素进行一系列并行或串行的流水线操作。 比如过滤保留部分元素、对元素进行排序、类型转换等；最后再进行一个终端操作，可以把 Stream 转换回集合类">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Stream流式编程">
+<meta property="og:url" content="https://dgggj.github.io/2022/04/15/Stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B/index.html">
+<meta property="og:site_name" content="牧羊少年的代码之旅">
+<meta property="og:description" content="概要stream是用于对迭代器的增强，使之完成更高效的聚合操作（过滤，排序，统计分组）或者大批量数据操作。 stream和lambada表示结合后会大大提升编程效率。 通过将集合转换为这么一种叫做 “流” 的元素序列，通过声明性方式，能够对集合中的每个元素进行一系列并行或串行的流水线操作。 比如过滤保留部分元素、对元素进行排序、类型转换等；最后再进行一个终端操作，可以把 Stream 转换回集合类">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover9.jpg">
+<meta property="article:published_time" content="2022-04-15T11:27:02.000Z">
+<meta property="article:modified_time" content="2022-04-15T11:31:24.315Z">
+<meta property="article:author" content="chy_lua">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="Stream">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover9.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://dgggj.github.io/2022/04/15/Stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Stream流式编程',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-04-15 19:31:24'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="https://csdn.jsdeliver.net/gh/constown/HexoCustomFile@0.0.4/dist/css/custom.min.css"><meta name="generator" content="Hexo 6.1.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/touxiang.jpeg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">10</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友人帐</span></a></li><li><a class="site-page child" href="/share/"><i class="fa-fw fas fa-share"></i><span> 分享</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/messageboard/"><i class="fa-fw fas fa-comment-dots"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user-tag"></i><span> 关于作者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover9.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">牧羊少年的代码之旅</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友人帐</span></a></li><li><a class="site-page child" href="/share/"><i class="fa-fw fas fa-share"></i><span> 分享</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/messageboard/"><i class="fa-fw fas fa-comment-dots"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user-tag"></i><span> 关于作者</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Stream流式编程</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-04-15T11:27:02.000Z" title="发表于 2022-04-15 19:27:02">2022-04-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-04-15T11:31:24.315Z" title="更新于 2022-04-15 19:31:24">2022-04-15</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Stream/">Stream</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">4.8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>22分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Stream流式编程"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><p>stream是用于对迭代器的增强，使之完成更高效的聚合操作（过滤，排序，统计分组）或者大批量数据操作。</p>
+<p>stream和lambada表示结合后会大大提升编程效率。</p>
+<p>通过将集合转换为这么一种叫做 “流” 的元素序列，通过声明性方式，能够对集合中的每个元素进行一系列并行或串行的流水线操作。</p>
+<p>比如过滤保留部分元素、对元素进行排序、类型转换等；最后再进行一个终端操作，可以把 Stream 转换回集合类型，也可以直接对其中的各个元素进行处理，比如打印、比如计算总数、计算最大值等等。</p>
+<p><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/stream/stream/0001.png" alt="stream"></p>
+<h2 id="一分类"><a href="#一分类" class="headerlink" title="一分类"></a>一分类</h2><p>Stream提供方法很多，按照调用当前方法是否结束流处理，可以分为中间操作和结束操作。</p>
+<img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/stream/stream/0002.png" alt="stream" style="zoom:50%;" />
+
+<h3 id="1中间操作"><a href="#1中间操作" class="headerlink" title="1中间操作"></a>1中间操作</h3><ul>
+<li>无状态操作：指当前元素的操作不受前面元素的影响，前后数据是否有依赖关系。</li>
+<li>有状态操作：指当前元素的操作需要等所有元素处理完之后才能进行。</li>
+</ul>
+<p>比如说：sort(),distinct()需要知道先前的数才能操作，属于有状态操作</p>
+<h3 id="2结束操作"><a href="#2结束操作" class="headerlink" title="2结束操作"></a>2结束操作</h3><ul>
+<li>短路操作:指不需要处理完全部的元素就可以结束。</li>
+<li>非短路操作: 指必须处理完所有元素才能结束。</li>
+</ul>
+<img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/stream/stream/0003.png" alt="stream" style="zoom: 33%;" />
+
+
+
+<h3 id="3Stream流的三种创建方式"><a href="#3Stream流的三种创建方式" class="headerlink" title="3Stream流的三种创建方式"></a>3Stream流的三种创建方式</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1集合创建stream流是          集合名.stream();</span></span><br><span class="line">List&lt;Integer&gt; list = Arrays.asList(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>);</span><br><span class="line">Stream&lt;Integer&gt; stream = list.stream();</span><br><span class="line"><span class="comment">//2数组创建stream流是           Arrays.stream(数组名)</span></span><br><span class="line"><span class="type">IntStream</span> <span class="variable">stream</span> <span class="operator">=</span> Arrays.stream(<span class="keyword">new</span> <span class="title class_">int</span>[]&#123;<span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>&#125;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//3Stream 静态方法</span></span><br><span class="line">Stream&lt;Integer&gt; stream = Stream.of(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line">Stream&lt;String&gt; stream0 = Stream.of(<span class="string">&quot;ab&quot;</span>, <span class="string">&quot;abc&quot;</span>, <span class="string">&quot;abcd&quot;</span>, <span class="string">&quot;abcde&quot;</span>, <span class="string">&quot;abcdef&quot;</span>);</span><br><span class="line"></span><br><span class="line">Stream&lt;Integer&gt; stream2 = Stream.iterate(<span class="number">0</span>, (x) -&gt; x + <span class="number">3</span>).limit(<span class="number">5</span>);</span><br><span class="line">stream2.forEach(r -&gt; System.out.print(r + <span class="string">&quot; &quot;</span>));</span><br><span class="line"></span><br><span class="line">System.out.println();</span><br><span class="line"></span><br><span class="line">Stream&lt;Integer&gt; stream3 = Stream.generate(<span class="keyword">new</span> <span class="title class_">Random</span>()::nextInt).limit(<span class="number">3</span>);</span><br><span class="line">stream3.forEach(r -&gt; System.out.print(r + <span class="string">&quot; &quot;</span>));</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="二无状态操作"><a href="#二无状态操作" class="headerlink" title="二无状态操作"></a>二无状态操作</h2><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/stream/stream/0005.png" alt="stream" style="zoom: 33%;" />
+
+<h3 id="2-1-map"><a href="#2-1-map" class="headerlink" title="2.1. map"></a>2.1. map</h3><p>接收一个函数作为入参，把这个函数应用到每个元素上，执行结果组成一个新的 stream 返回。</p>
+<img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/stream/stream/0004.png" alt="stream" style="zoom:50%;" />
+
+<p>例子1：对整数数组每个元素加 3 ：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; list=Array.asList(<span class="number">5</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">1</span>,<span class="number">4</span>);</span><br><span class="line">list.stream().map(v-&gt;v+<span class="number">3</span>).collect(Collectors.toList);</span><br></pre></td></tr></table></figure>
+
+<p>结果为：</p>
+<blockquote>
+<p>8 5 6 4 7</p>
+</blockquote>
+<p>例子2: 把字符数组每个元素都变成大写</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    List&lt;String&gt; list = Arrays.asList(<span class="string">&quot;abs&quot;</span>, <span class="string">&quot;sds&quot;</span>, <span class="string">&quot;hello&quot;</span>);</span><br><span class="line">    List&lt;String&gt; collect = list.stream().map(s -&gt; s.toUpperCase(Locale.ROOT)).collect(Collectors.toList());</span><br><span class="line">    System.out.println(collect);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>结果为</p>
+<blockquote>
+<p>[ABS, SDS, HELLO]</p>
+</blockquote>
+<h3 id="2-2-mapToXXX"><a href="#2-2-mapToXXX" class="headerlink" title="2.2 mapToXXX"></a>2.2 mapToXXX</h3><p>包括三个方法：mapToInt、mapToDouble、mapToLong</p>
+<p>案例 3：把字符串数组转为整数数组：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; list = Arrays.asList(<span class="string">&quot;ab&quot;</span>, <span class="string">&quot;abc&quot;</span>, <span class="string">&quot;abcd&quot;</span>, <span class="string">&quot;abcde&quot;</span>, <span class="string">&quot;abcdef&quot;</span>);</span><br><span class="line"><span class="type">int</span>[] newList = list.stream().mapToInt(r -&gt; r.length()).toArray();</span><br><span class="line">System.out.println(<span class="string">&quot;newList:&quot;</span> + Arrays.toString(newList));</span><br></pre></td></tr></table></figure>
+
+
+
+<p>结果：</p>
+<blockquote>
+<p>newList:[2, 3, 4, 5, 6]</p>
+</blockquote>
+<h3 id="2-3-flatMap"><a href="#2-3-flatMap" class="headerlink" title="2.3 flatMap"></a>2.3 flatMap</h3><p>flatMap接收函数作为入参，然后把集合中每个元素转换成一个 stream，再把这些 stream 组成一个新的 stream，是拆分单词很好的工具。如下图：</p>
+<img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/stream/stream/0008.png" alt="stream" style="zoom:50%;" />
+
+<p>案例 4：把一个字符串数组转成另一个字符串数组：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; list = Arrays.asList(<span class="string">&quot;ab-abc-abcd-abcde-abcdef&quot;</span>, <span class="string">&quot;5-2-3-1-4&quot;</span>);</span><br><span class="line">List&lt;String&gt; newList = list.stream().flatMap(s -&gt; Arrays.stream(s.split(<span class="string">&quot;-&quot;</span>))).collect(Collectors.toList());</span><br><span class="line">System.out.println(<span class="string">&quot;newList：&quot;</span> + newList);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>上面代码输出结果：</p>
+<blockquote>
+<p>newList：[ab, abc, abcd, abcde, abcdef, 5, 2, 3, 1, 4]</p>
+</blockquote>
+<h3 id="2-4-flatMapToXXX"><a href="#2-4-flatMapToXXX" class="headerlink" title="2.4 flatMapToXXX"></a>2.4 flatMapToXXX</h3><p>类似于 flatMap，返回一个 XXXStream。</p>
+<p>包括三个方法：flatMapToInt、flatMapToLong、flatMapToDouble</p>
+<p>案例 5：对给定的二维整数数组求和:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span>[][] data = &#123;&#123;<span class="number">1</span>,<span class="number">2</span>&#125;,&#123;<span class="number">3</span>,<span class="number">4</span>&#125;,&#123;<span class="number">5</span>,<span class="number">6</span>&#125;&#125;;</span><br><span class="line"><span class="type">IntStream</span> <span class="variable">intStream</span> <span class="operator">=</span> Arrays.stream(data).flatMapToInt(a -&gt; Arrays.stream(a));</span><br><span class="line"><span class="type">int</span>[] ints = intStream.map(a -&gt; a + <span class="number">1</span>).toArray();</span><br><span class="line">System.out.println(Arrays.toString(ints));</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<blockquote>
+<p>[2, 3, 4, 5, 6, 7]</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span>[][] data = &#123;&#123;<span class="number">1</span>,<span class="number">2</span>&#125;,&#123;<span class="number">3</span>,<span class="number">4</span>&#125;,&#123;<span class="number">5</span>,<span class="number">6</span>&#125;&#125;;</span><br><span class="line"><span class="type">IntStream</span> <span class="variable">intStream</span> <span class="operator">=</span> Arrays.stream(data).flatMapToInt(row -&gt; Arrays.stream(row));</span><br><span class="line">System.out.println(intStream.sum());</span><br></pre></td></tr></table></figure>
+
+<p>​    输出</p>
+<blockquote>
+<p>21</p>
+</blockquote>
+<h3 id="2-5-filter"><a href="#2-5-filter" class="headerlink" title="2.5 filter"></a>2.5 filter</h3><p>筛选功能，按照一定的规则将符合条件的元素提取到新的流中。</p>
+<p>定义一个学生类，包含姓名、年龄、性别、考试成绩四个属性</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Student</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> Integer age;</span><br><span class="line">    <span class="keyword">private</span> String sex;</span><br><span class="line">    <span class="keyword">private</span> Integer score;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Student</span><span class="params">(String name, Integer age, String sex, Integer score)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">        <span class="built_in">this</span>.age = age;</span><br><span class="line">        <span class="built_in">this</span>.score = score;</span><br><span class="line">        <span class="built_in">this</span>.sex = sex;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//省略getters/setters</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>案例 6：找出考试成绩在 90 分以上的学生姓名：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Student&gt; students = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Mike&quot;</span>, <span class="number">10</span>, <span class="string">&quot;male&quot;</span>, <span class="number">88</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Jack&quot;</span>, <span class="number">13</span>,<span class="string">&quot;male&quot;</span>, <span class="number">90</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Lucy&quot;</span>, <span class="number">15</span>,<span class="string">&quot;female&quot;</span>, <span class="number">100</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Jessie&quot;</span>, <span class="number">12</span>,<span class="string">&quot;female&quot;</span>, <span class="number">78</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Allon&quot;</span>, <span class="number">16</span>,<span class="string">&quot;female&quot;</span>, <span class="number">92</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Alis&quot;</span>, <span class="number">22</span>,<span class="string">&quot;female&quot;</span>, <span class="number">50</span>));</span><br><span class="line">List&lt;String&gt;list=students.stream().filter(a-&gt;a.get(score)&gt;<span class="number">90</span>).map(a-&gt;a.getName()).collect(Collectors.toList());</span><br><span class="line"></span><br><span class="line"> System.out.println(list);</span><br></pre></td></tr></table></figure>
+
+<p>结果</p>
+<blockquote>
+<p>[Jack, Lucy, Allon]</p>
+</blockquote>
+<h3 id="2-6-peek"><a href="#2-6-peek" class="headerlink" title="2.6 peek"></a>2.6 peek</h3><p>返回由 stream 中元素组成的新 stream，用给定的函数作用在新 stream 的每个元素上。传入的函数是一个 Consume  类型的，没有返回值，因此并不会改变原 stream 中元素的值。peek 主要用是 debug，可以方便地 查看流处理结果是否正确。</p>
+<p>案例 7：过滤出 stream 中长度大于 3 的字符串并转为大写：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Stream.of(<span class="string">&quot;one&quot;</span>, <span class="string">&quot;two&quot;</span>, <span class="string">&quot;three&quot;</span>, <span class="string">&quot;four&quot;</span>)</span><br><span class="line">             .filter(e -&gt; e.length() &gt; <span class="number">3</span>)</span><br><span class="line">             .peek(e -&gt; System.out.println(<span class="string">&quot;Filtered value: &quot;</span> + e))</span><br><span class="line">             .map(String::toUpperCase)</span><br><span class="line">             .peek(e -&gt; System.out.println(<span class="string">&quot;Mapped value: &quot;</span> + e))</span><br><span class="line">             .collect(Collectors.toList());</span><br></pre></td></tr></table></figure>
+
+
+
+<p>输出结果如下：</p>
+<blockquote>
+<p>Filtered value: three </p>
+<p>Mapped value: THREE </p>
+<p>Filtered value: four </p>
+<p>Mapped value: FOUR</p>
+</blockquote>
+<h3 id="2-7-unordered"><a href="#2-7-unordered" class="headerlink" title="2.7 unordered"></a>2.7 unordered</h3><p>把一个有序的 stream 转成一个无序 stream ，如果原 stream 本身就是无序的，可能会返回原始的 stream。</p>
+<p>案例 8：把一个有序数组转成无序</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Arrays.asList(<span class="string">&quot;1&quot;</span>, <span class="string">&quot;2&quot;</span>, <span class="string">&quot;3&quot;</span>, <span class="string">&quot;4&quot;</span>, <span class="string">&quot;5&quot;</span>)</span><br><span class="line">                .parallelStream()<span class="comment">//并行编程。只有并行编程时才无序</span></span><br><span class="line">                .unordered()</span><br><span class="line">                .forEach(r -&gt; System.out.print(r + <span class="string">&quot; &quot;</span>));</span><br></pre></td></tr></table></figure>
+
+
+
+<p>每次执行输出的结果不一样，下面是一次输出的结果：</p>
+<blockquote>
+<p>3 5 4 2 1</p>
+</blockquote>
+<h2 id="三-有状态操作"><a href="#三-有状态操作" class="headerlink" title="三 有状态操作"></a>三 有状态操作</h2><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/stream/stream/0006.png" alt="stream" style="zoom:50%;" />
+
+<h3 id="3-1-distinct"><a href="#3-1-distinct" class="headerlink" title="3.1 distinct"></a>3.1 distinct</h3><p>去重功能。</p>
+<p>案例 9 ：去掉字符串数组中的重复字符串</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String[] array = &#123; <span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;c&quot;</span>, <span class="string">&quot;c&quot;</span>, <span class="string">&quot;d&quot;</span>, <span class="string">&quot;d&quot;</span>, <span class="string">&quot;e&quot;</span>, <span class="string">&quot;e&quot;</span>&#125;;</span><br><span class="line">List&lt;String&gt; newList = Arrays.stream(array).distinct().collect(Collectors.toList());</span><br><span class="line">System.out.println(<span class="string">&quot;newList:&quot;</span> + newList);</span><br></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<blockquote>
+<p>newList:[a, b, c, d, e]</p>
+</blockquote>
+<h3 id="3-2-limit"><a href="#3-2-limit" class="headerlink" title="3.2 limit"></a>3.2 limit</h3><p>限制从 stream 中获取前 n 个元素。</p>
+<p>案例 10 ：从数组中获取前 5 个元素</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String[] array = &#123; <span class="string">&quot;c&quot;</span>, <span class="string">&quot;c&quot;</span>, <span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;e&quot;</span>, <span class="string">&quot;e&quot;</span>, <span class="string">&quot;d&quot;</span>, <span class="string">&quot;d&quot;</span>&#125;;</span><br><span class="line">List&lt;String&gt; newList = Arrays.stream(array).limit(<span class="number">5</span>).collect(Collectors.toList());</span><br><span class="line">System.out.println(<span class="string">&quot;newList:&quot;</span> + newList);</span><br></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<blockquote>
+<p>newList:[c, c, a, b, b]</p>
+</blockquote>
+<h3 id="3-3-skip"><a href="#3-3-skip" class="headerlink" title="3.3 skip"></a>3.3 skip</h3><p>跳过 Stream 中前 n 个元素</p>
+<p>案例 11：从数组中获取第 5 个元素之后的元素</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String[] array = &#123; <span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;c&quot;</span>, <span class="string">&quot;d&quot;</span>, <span class="string">&quot;e&quot;</span>, <span class="string">&quot;f&quot;</span>, <span class="string">&quot;g&quot;</span>, <span class="string">&quot;h&quot;</span>, <span class="string">&quot;i&quot;</span>&#125;;</span><br><span class="line">List&lt;String&gt; newList = Arrays.stream(array).skip(<span class="number">5</span>).collect(Collectors.toList());</span><br><span class="line">System.out.println(<span class="string">&quot;newList:&quot;</span> + newList);</span><br></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<blockquote>
+<p>newList:[f, g, h, i]</p>
+</blockquote>
+<h3 id="3-4-sorted"><a href="#3-4-sorted" class="headerlink" title="3.4 sorted"></a>3.4 sorted</h3><p>排序功能。</p>
+<p>案例 12：对给定数组进行排序</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String[] array = &#123; <span class="string">&quot;c&quot;</span>, <span class="string">&quot;c&quot;</span>, <span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;e&quot;</span>, <span class="string">&quot;e&quot;</span>, <span class="string">&quot;d&quot;</span>, <span class="string">&quot;d&quot;</span>&#125;;</span><br><span class="line">List&lt;String&gt; newList = Arrays.stream(array).sorted().collect(Collectors.toList());</span><br><span class="line">System.out.println(<span class="string">&quot;newList:&quot;</span> + newList);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>输出结果：</p>
+<blockquote>
+<p>newList:[a, b, b, c, c, d, d, e, e]</p>
+</blockquote>
+<p>案例 13：按照学生成绩进行排序</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Student&gt; students = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Mike&quot;</span>, <span class="number">10</span>, <span class="string">&quot;male&quot;</span>, <span class="number">88</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Jack&quot;</span>, <span class="number">13</span>,<span class="string">&quot;male&quot;</span>, <span class="number">90</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Lucy&quot;</span>, <span class="number">15</span>,<span class="string">&quot;female&quot;</span>, <span class="number">100</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Jessie&quot;</span>, <span class="number">12</span>,<span class="string">&quot;female&quot;</span>, <span class="number">78</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Allon&quot;</span>, <span class="number">16</span>,<span class="string">&quot;female&quot;</span>, <span class="number">92</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Alis&quot;</span>, <span class="number">22</span>,<span class="string">&quot;female&quot;</span>, <span class="number">50</span>));</span><br><span class="line"></span><br><span class="line">List&lt;String&gt; nameList = students.stream().sorted(Comparator.comparing(Student::getScore)).map(Student::getName).collect(Collectors.toList());</span><br><span class="line">System.out.print(<span class="string">&quot;按成绩排序输出学生姓名：&quot;</span> + nameList);</span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>考试成绩90分以上的学生姓名：[Alis, Jessie, Mike, Jack, Allon, Lucy]</p>
+</blockquote>
+<h2 id="四短路操作"><a href="#四短路操作" class="headerlink" title="四短路操作"></a>四短路操作</h2><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/stream/stream/0007.png" alt="stream" style="zoom:50%;" />
+
+<h3 id="4-1-findAny"><a href="#4-1-findAny" class="headerlink" title="4.1 findAny"></a>4.1 findAny</h3><p>找出 stream 中任何一个满足过滤条件的元素。</p>
+<p>案例 14：找出任何一个成绩高于 90 分的学生</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Student&gt; students = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Mike&quot;</span>, <span class="number">10</span>, <span class="string">&quot;male&quot;</span>, <span class="number">88</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Jack&quot;</span>, <span class="number">13</span>,<span class="string">&quot;male&quot;</span>, <span class="number">90</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Lucy&quot;</span>, <span class="number">15</span>,<span class="string">&quot;female&quot;</span>, <span class="number">100</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Jessie&quot;</span>, <span class="number">12</span>,<span class="string">&quot;female&quot;</span>, <span class="number">78</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Allon&quot;</span>, <span class="number">16</span>,<span class="string">&quot;female&quot;</span>, <span class="number">92</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Alis&quot;</span>, <span class="number">22</span>,<span class="string">&quot;female&quot;</span>, <span class="number">50</span>));</span><br><span class="line"></span><br><span class="line">Optional&lt;Student&gt; studentFindAny = students.stream().filter(x -&gt; x.getScore() &gt; <span class="number">90</span>).findAny();</span><br><span class="line">System.out.print(<span class="string">&quot;找出任意一个考试成绩在90分以上的学生姓名：&quot;</span> + studentFindAny.orElseGet(<span class="literal">null</span>).getName());</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>找出任意一个考试成绩在90分以上的学生姓名：Lucy</p>
+</blockquote>
+<h3 id="4-2-anyMatch"><a href="#4-2-anyMatch" class="headerlink" title="4.2 anyMatch"></a>4.2 anyMatch</h3><p>是否存在任意一个满足给定条件的元素。</p>
+<p>案例 15：是否存在成绩高于 90 分的学生，是否存在成绩低于 50 分的学生。还是采用上面案例 14 中的学生集合。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">boolean</span> <span class="variable">result1</span> <span class="operator">=</span> students.stream().allMatch(x -&gt; x.getScore() &gt; <span class="number">90</span>);</span><br><span class="line">System.out.println(<span class="string">&quot;是否所有学生的成绩都高于90分：&quot;</span> + result1);</span><br><span class="line"><span class="type">boolean</span> <span class="variable">result2</span> <span class="operator">=</span> students.stream().allMatch(x -&gt; x.getScore() &gt; <span class="number">50</span>);</span><br><span class="line">System.out.print(<span class="string">&quot;是否所有学生的成绩都高于50分：&quot;</span> + result2);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>输出结果：</p>
+<blockquote>
+<p>是否所有学生的成绩都高于90分：false</p>
+<p>是否所有学生的成绩都高于50分：true</p>
+</blockquote>
+<h3 id="4-3-allMatch"><a href="#4-3-allMatch" class="headerlink" title="4.3 allMatch"></a>4.3 allMatch</h3><p>是否集合中所有元素都满足给定的条件，如果集合是空，则返回 true。</p>
+<p>案例 16：学生成绩是否都高于 90 分，是否都高于 50 分。还是采用上面案例 14 中的学生集合。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">boolean</span> <span class="variable">result1</span> <span class="operator">=</span> students.stream().allMatch(x -&gt; x.getScore() &gt; <span class="number">90</span>);</span><br><span class="line">System.out.println(<span class="string">&quot;是否所有学生的成绩都高于90分：&quot;</span> + result1);</span><br><span class="line"><span class="type">boolean</span> <span class="variable">result2</span> <span class="operator">=</span> students.stream().allMatch(x -&gt; x.getScore() &gt; <span class="number">50</span>);</span><br><span class="line">System.out.print(<span class="string">&quot;是否所有学生的成绩都高于50分：&quot;</span> + result2);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>输出结果：</p>
+<blockquote>
+<p>是否所有学生的成绩都高于90分：false</p>
+<p>是否所有学生的成绩都高于50分：true</p>
+</blockquote>
+<h3 id="4-4-noneMatch"><a href="#4-4-noneMatch" class="headerlink" title="4.4 noneMatch"></a>4.4 noneMatch</h3><p>是否没有元素能匹配给定的条件，如果集合是空，则返回 true。</p>
+<p>案例 17：是不是没有学生成绩在 90 分以上，是否没有学生成绩在 50 分以下。还是采用上面案例 14 中的学生集合。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">boolean</span> <span class="variable">result1</span> <span class="operator">=</span> students.stream().noneMatch(x -&gt; x.getScore() &gt; <span class="number">90</span>);</span><br><span class="line">System.out.println(<span class="string">&quot;是不是没有学生成绩在 90 分以上：&quot;</span> + result1);</span><br><span class="line"><span class="type">boolean</span> <span class="variable">result2</span> <span class="operator">=</span> students.stream().noneMatch(x -&gt; x.getScore() &lt; <span class="number">50</span>);</span><br><span class="line">System.out.print(<span class="string">&quot;是不是没有学生成绩在 50 分以下：&quot;</span> + result2);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>输出结果：</p>
+<blockquote>
+<p>是不是没有学生成绩在 90 分以上：false</p>
+<p>是不是没有学生成绩在 50 分以下：true</p>
+</blockquote>
+<h3 id="4-5-findFirst"><a href="#4-5-findFirst" class="headerlink" title="4.5 findFirst"></a>4.5 findFirst</h3><p>找出第一个符合条件的元素。</p>
+<p>案例 18：找出第一个成绩在 90 分以上的学生。还是采用上面案例 14 中的学生集合。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Optional&lt;Student&gt; studentFindAny = students.stream().filter(x -&gt; x.getScore() &gt; <span class="number">90</span>).findFirst();</span><br><span class="line">System.out.print(<span class="string">&quot;第一个成绩在 90 分以上的学生姓名：&quot;</span> + studentFindAny.orElseGet(<span class="literal">null</span>).getName());</span><br><span class="line"></span><br><span class="line">输出结果：</span><br></pre></td></tr></table></figure>
+
+
+
+<p>输出结果：</p>
+<blockquote>
+<p>第一个成绩在 90 分以上的学生姓名：Lucy</p>
+</blockquote>
+<h2 id="五非短路操作"><a href="#五非短路操作" class="headerlink" title="五非短路操作"></a>五非短路操作</h2><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/stream/stream/0009.png" alt="stream" style="zoom:50%;" />
+
+<h3 id="5-1-forEach"><a href="#5-1-forEach" class="headerlink" title="5.1 forEach"></a>5.1 forEach</h3><p>遍历元素。</p>
+<p>案例 19：遍历一个数组并打印</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; array = Arrays.asList(<span class="number">5</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>);</span><br><span class="line">array.stream().forEach(System.out :: println);</span><br></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<blockquote>
+<p>5 2 3 1 4</p>
+</blockquote>
+<h3 id="5-2-forEachOrdered"><a href="#5-2-forEachOrdered" class="headerlink" title="5.2 forEachOrdered"></a>5.2 forEachOrdered</h3><p>按照给定集合中元素的顺序输出。主要使用场景是在并行流的情况下，按照给定的顺序输出元素。</p>
+<p>案例 20：用并行流遍历一个数组并按照给定数组的顺序输出结果</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; array = Arrays.asList(<span class="number">5</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>);</span><br><span class="line">array.parallelStream().forEachOrdered(System.out :: println);</span><br></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<blockquote>
+<p>5 2 3 1 4</p>
+</blockquote>
+<h3 id="5-3-toArray"><a href="#5-3-toArray" class="headerlink" title="5.3 toArray"></a>5.3 toArray</h3><p>返回包括给定 stream 中所有元素的数组。</p>
+<p>案例 21：把给定字符串流转化成数组</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Stream&lt;String&gt; stream = Arrays.asList(<span class="string">&quot;ab&quot;</span>, <span class="string">&quot;abc&quot;</span>, <span class="string">&quot;abcd&quot;</span>, <span class="string">&quot;abcde&quot;</span>, <span class="string">&quot;abcdef&quot;</span>).stream();</span><br><span class="line">String[] newArray1 = stream.toArray(str -&gt; <span class="keyword">new</span> <span class="title class_">String</span>[<span class="number">5</span>]);</span><br><span class="line">String[] newArray2 = stream.toArray(String[]::<span class="keyword">new</span>);</span><br><span class="line">Object[] newArray3 = stream.toArray();</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<h3 id="5-4-reduce"><a href="#5-4-reduce" class="headerlink" title="5.4 reduce"></a>5.4 reduce</h3><p>规约操作，把一个流的所有元素合并成一个元素，比如求和、求乘积、求最大最小值等。</p>
+<p>案例 22：求整数数组元素之和、乘积和最大值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; list = Arrays.asList(<span class="number">5</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>);</span><br><span class="line">Optional&lt;Integer&gt; sum = list.stream().reduce((x, y) -&gt; x + y);</span><br><span class="line">Optional&lt;Integer&gt; product = list.stream().reduce((x, y) -&gt; x * y);</span><br><span class="line">Optional&lt;Integer&gt; max = list.stream().reduce((x, y) -&gt; x &gt; y ? x : y);</span><br><span class="line">System.out.println(<span class="string">&quot;数组元素之和：&quot;</span> + sum.get());</span><br><span class="line">System.out.println(<span class="string">&quot;数组元素乘积：&quot;</span> + product.get());</span><br><span class="line">System.out.println(<span class="string">&quot;数组元素最大值：&quot;</span> + max.get());</span><br></pre></td></tr></table></figure>
+
+
+
+<p>输出结果：</p>
+<blockquote>
+<p>数组元素之和：15</p>
+<p>数组元素乘积：120 </p>
+<p>数组元素最大值：5</p>
+</blockquote>
+<p>案例 23：求全班学生最高分、全班学生总分</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Student&gt; students = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Mike&quot;</span>, <span class="number">10</span>, <span class="string">&quot;male&quot;</span>, <span class="number">88</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Jack&quot;</span>, <span class="number">13</span>,<span class="string">&quot;male&quot;</span>, <span class="number">90</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Lucy&quot;</span>, <span class="number">15</span>,<span class="string">&quot;female&quot;</span>, <span class="number">100</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Jessie&quot;</span>, <span class="number">12</span>,<span class="string">&quot;female&quot;</span>, <span class="number">78</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Allon&quot;</span>, <span class="number">16</span>,<span class="string">&quot;female&quot;</span>, <span class="number">92</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Alis&quot;</span>, <span class="number">22</span>,<span class="string">&quot;female&quot;</span>, <span class="number">50</span>));</span><br><span class="line">Optional&lt;Integer&gt; maxScore = students.stream().map(r -&gt; r.getScore()).reduce(Integer::max);</span><br><span class="line">Optional&lt;Integer&gt; sumScore = students.stream().map(r -&gt; r.getScore()).reduce(Integer::sum);</span><br><span class="line">System.out.println(<span class="string">&quot;全班学生最高分：&quot;</span> + maxScore.get());</span><br><span class="line">System.out.println(<span class="string">&quot;全班学生总分：&quot;</span> + sumScore.get());</span><br></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<blockquote>
+<p>全班学生最高分：100 </p>
+<p>全班学生总分：498</p>
+</blockquote>
+<h3 id="5-5-collect"><a href="#5-5-collect" class="headerlink" title="5.5 collect"></a>5.5 collect</h3><p>把 stream 中的元素归集到新的集合或者归集成单个元素。</p>
+<h4 id="5-5-1-归集成新集合"><a href="#5-5-1-归集成新集合" class="headerlink" title="5.5.1 归集成新集合"></a>5.5.1 归集成新集合</h4><p>方法包括 toList、toSet、toMap。</p>
+<p>案例 24：根据学生列表，归纳出姓名列表、不同分数列表、姓名分数集合，其中 Mike 和 Jessie 的分数都是 88。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Student&gt; students = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Mike&quot;</span>, <span class="number">10</span>, <span class="string">&quot;male&quot;</span>, <span class="number">88</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Jack&quot;</span>, <span class="number">13</span>,<span class="string">&quot;male&quot;</span>, <span class="number">90</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Lucy&quot;</span>, <span class="number">15</span>,<span class="string">&quot;female&quot;</span>, <span class="number">100</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Jessie&quot;</span>, <span class="number">12</span>,<span class="string">&quot;female&quot;</span>, <span class="number">88</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Allon&quot;</span>, <span class="number">16</span>,<span class="string">&quot;female&quot;</span>, <span class="number">92</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Alis&quot;</span>, <span class="number">22</span>,<span class="string">&quot;female&quot;</span>, <span class="number">50</span>));</span><br><span class="line">List&lt;String&gt; list = students.stream().map(r -&gt; r.getName()).collect(Collectors.toList());</span><br><span class="line">Set&lt;Integer&gt; set = students.stream().map(r -&gt; r.getScore()).collect(Collectors.toSet());</span><br><span class="line">Map&lt;String, Integer&gt; map = students.stream().collect(Collectors.toMap(Student::getName, Student::getScore));</span><br><span class="line">System.out.println(<span class="string">&quot;全班学生姓名列表：&quot;</span> + list);</span><br><span class="line">System.out.println(<span class="string">&quot;全班学生不同分数列表：&quot;</span> + set);</span><br><span class="line">System.out.println(<span class="string">&quot;全班学生姓名分数集合：&quot;</span> + map);</span><br></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<blockquote>
+<p>全班学生姓名列表：[Mike, Jack, Lucy, Jessie, Allon, Alis] </p>
+<p>全班学生不同分数列表：[50, 100, 88, 90, 92] </p>
+<p>全班学生姓名分数集合：{Mike&#x3D;88, Allon&#x3D;92, Alis&#x3D;50, Lucy&#x3D;100, Jack&#x3D;90, Jessie&#x3D;88}</p>
+</blockquote>
+<h4 id="5-5-2-统计功能"><a href="#5-5-2-统计功能" class="headerlink" title="5.5.2 统计功能"></a>5.5.2 统计功能</h4><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/stream/stream/0010.png" alt="stream" style="zoom:50%;" />
+
+<p>统计功能包括如下方法：</p>
+<img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/stream/stream/0011.png" alt="stream" style="zoom:50%;" />
+
+
+
+<p>   案例 25：求总数、求和、最大&#x2F;最小&#x2F;平均值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; list = Arrays.asList(<span class="number">5</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>);</span><br><span class="line"><span class="type">long</span> <span class="variable">count</span> <span class="operator">=</span> list.stream().collect(Collectors.counting());</span><br><span class="line"><span class="type">int</span> <span class="variable">sum</span> <span class="operator">=</span> list.stream().collect(Collectors.summingInt(r -&gt; r));</span><br><span class="line"><span class="type">double</span> <span class="variable">average</span> <span class="operator">=</span> list.stream().collect(Collectors.averagingDouble(r -&gt; r));</span><br><span class="line">Optional&lt;Integer&gt; max = list.stream().collect(Collectors.maxBy(Integer::compare));</span><br><span class="line">Optional&lt;Integer&gt; min = list.stream().collect(Collectors.maxBy((x, y) -&gt; x &gt; y ? y : x));</span><br><span class="line">System.out.println(<span class="string">&quot;总数:&quot;</span> + count);</span><br><span class="line">System.out.println(<span class="string">&quot;总和:&quot;</span> + sum);</span><br><span class="line">System.out.println(<span class="string">&quot;平均值:&quot;</span> + average);</span><br><span class="line">System.out.println(<span class="string">&quot;最大值:&quot;</span> + max.get());</span><br><span class="line">System.out.println(<span class="string">&quot;最小值:&quot;</span> + min.get());</span><br></pre></td></tr></table></figure>
+
+
+
+<p>输出结果：</p>
+<blockquote>
+<p>总数:5 </p>
+<p>总和:15 </p>
+<p>平均值:3.0 </p>
+<p>最大值:5 </p>
+<p>最小值:5</p>
+</blockquote>
+<p>案例 26：求总和统计</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; list = Arrays.asList(<span class="number">5</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>);</span><br><span class="line"><span class="type">IntSummaryStatistics</span> <span class="variable">statistics</span> <span class="operator">=</span> list.stream().collect(Collectors.summarizingInt(r -&gt; r));</span><br><span class="line">System.out.println(<span class="string">&quot;综合统计结果：&quot;</span> + statistics.toString());</span><br></pre></td></tr></table></figure>
+
+
+
+<p>输出结果：</p>
+<blockquote>
+<p>综合统计结果：IntSummaryStatistics{count&#x3D;5, sum&#x3D;15, min&#x3D;1, average&#x3D;3.000000, max&#x3D;5}</p>
+</blockquote>
+<h4 id="5-5-3-分区和分组"><a href="#5-5-3-分区和分组" class="headerlink" title="5.5.3 分区和分组"></a>5.5.3 分区和分组</h4><p>主要包括两个函数：</p>
+<ul>
+<li>partitioningBy：把 stream 分成两个 map</li>
+<li>groupingBy：把 stream 分成多个 map</li>
+</ul>
+<p>案例 27：将学生按照 80 分以上和以下分区</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Student&gt; students = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Mike&quot;</span>, <span class="number">10</span>, <span class="string">&quot;male&quot;</span>, <span class="number">88</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Jack&quot;</span>, <span class="number">10</span>,<span class="string">&quot;male&quot;</span>, <span class="number">90</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Lucy&quot;</span>, <span class="number">12</span>,<span class="string">&quot;female&quot;</span>, <span class="number">100</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Jessie&quot;</span>, <span class="number">12</span>,<span class="string">&quot;female&quot;</span>, <span class="number">78</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Allon&quot;</span>, <span class="number">16</span>,<span class="string">&quot;female&quot;</span>, <span class="number">92</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Alis&quot;</span>, <span class="number">16</span>,<span class="string">&quot;female&quot;</span>, <span class="number">50</span>));</span><br><span class="line">Map&lt;Boolean, List&lt;Student&gt;&gt; partitionByScore = students.stream().collect(Collectors.partitioningBy(x -&gt; x.getScore() &gt; <span class="number">80</span>));</span><br><span class="line">System.out.println(<span class="string">&quot;将学生按照考试成绩80分以上分区：&quot;</span>);</span><br><span class="line">partitionByScore.forEach((k,v ) -&gt; &#123;</span><br><span class="line">    System.out.print(k ? <span class="string">&quot;80分以上：&quot;</span> : <span class="string">&quot;80分以下：&quot;</span>);</span><br><span class="line">    v.forEach(r -&gt; System.out.print(r.getName() + <span class="string">&quot;,&quot;</span>));</span><br><span class="line">    System.out.println();</span><br><span class="line">&#125;);</span><br><span class="line">System.out.println();</span><br></pre></td></tr></table></figure>
+
+
+
+<p>分区结果是把 Student 列表分成 key 只有 true 和 false 两个值的 map，输出如下：</p>
+<blockquote>
+<p>将学生按照考试成绩80分以上分区：</p>
+<p>80分以下：Jessie,Alis,</p>
+<p>80分以上：Mike,Jack,Lucy,Allon,</p>
+</blockquote>
+<p>案例 28：将学生按照性别、年龄分组</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, Map&lt;Integer, List&lt;Student&gt;&gt;&gt; group = students.stream().collect(Collectors.groupingBy(Student::getSex, Collectors.groupingBy(Student::getAge)));</span><br><span class="line">System.out.println(<span class="string">&quot;将学生按照性别、年龄分组：&quot;</span>);</span><br><span class="line">group.forEach((k,v ) -&gt; &#123;</span><br><span class="line">    System.out.println(k +<span class="string">&quot;：&quot;</span>);</span><br><span class="line">    v.forEach((k1,v1) -&gt; &#123;</span><br><span class="line">        System.out.print(<span class="string">&quot;      &quot;</span> + k1 + <span class="string">&quot;:&quot;</span> );</span><br><span class="line">        v1.forEach(r -&gt; System.out.print(r.getName() + <span class="string">&quot;,&quot;</span>));</span><br><span class="line">        System.out.println();</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>输出如下：</p>
+<blockquote>
+<p>将学生按照性别、年龄分组：</p>
+<p>female：</p>
+<p>   16:Allon,Alis, </p>
+<p>   12:Lucy,Jessie, </p>
+<p>male：</p>
+<p>   10:Mike,Jack,</p>
+</blockquote>
+<h4 id="5-5-4-连接"><a href="#5-5-4-连接" class="headerlink" title="5.5.4 连接"></a>5.5.4 连接</h4><p>将 stream 中的元素用指定的连接符合并，连接符可以是空。</p>
+<p>案例 29：输出所有学生的姓名，用逗号分隔，这里还是使用案例 27 中的学生列表</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">studentNames</span> <span class="operator">=</span> students.stream().map(r -&gt; r.getName()).collect(Collectors.joining(<span class="string">&quot;,&quot;</span>));</span><br><span class="line">System.out.println(<span class="string">&quot;所有学生姓名列表：&quot;</span> + studentNames);</span><br></pre></td></tr></table></figure>
+
+<p>输出如下：</p>
+<blockquote>
+<p>所有学生姓名列表：Mike,Jack,Lucy,Jessie,Allon,Alis</p>
+</blockquote>
+<h4 id="5-5-5-规约"><a href="#5-5-5-规约" class="headerlink" title="5.5.5 规约"></a>5.5.5 规约</h4><p>在 5.4 节已经讲过规约了，这里的规约支持更强大的自定义规约。</p>
+<p>案例 30：数组中每个元素加 1 后求总和</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; list = Arrays.asList(<span class="number">5</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>);</span><br><span class="line"><span class="type">int</span> <span class="variable">listSum</span> <span class="operator">=</span> list.stream().collect(Collectors.reducing(<span class="number">0</span>, x -&gt; x + <span class="number">1</span>, (sum, b) -&gt; sum + b));</span><br><span class="line">System.out.println(<span class="string">&quot;数组中每个元素加 1 后总和：&quot;</span> + listSum);</span><br></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<blockquote>
+<p>数组中每个元素加 1 后总和：20</p>
+</blockquote>
+<h3 id="5-6-max、min、count"><a href="#5-6-max、min、count" class="headerlink" title="5.6 max、min、count"></a>5.6 max、min、count</h3><p>stream 提供的方便统计的方法。</p>
+<p>案例 31：统计整数数组中最大值、最小值、大于 3 的元素个数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; list = Arrays.asList(<span class="number">5</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">4</span>);</span><br><span class="line">System.out.println(<span class="string">&quot;数组元素最大值：&quot;</span>+list.stream().max(Integer::compareTo).get());</span><br><span class="line">System.out.println(<span class="string">&quot;数组元素最小值：&quot;</span>+list.stream().min(Integer::compareTo).get());</span><br><span class="line">System.out.println(<span class="string">&quot;数组中大于3的元素个数：&quot;</span>+list.stream().filter(x -&gt; x &gt; <span class="number">3</span>).count());</span><br></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<blockquote>
+<p>数组元素最大值：5</p>
+<p>数组元素最小值：1</p>
+<p>数组中大于3的元素个数：2</p>
+</blockquote>
+<p>案例 32：统计分数最高的学生姓名</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Student&gt; students = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Mike&quot;</span>, <span class="number">10</span>, <span class="string">&quot;male&quot;</span>, <span class="number">88</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Jack&quot;</span>, <span class="number">10</span>,<span class="string">&quot;male&quot;</span>, <span class="number">90</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Lucy&quot;</span>, <span class="number">12</span>,<span class="string">&quot;female&quot;</span>, <span class="number">100</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Jessie&quot;</span>, <span class="number">12</span>,<span class="string">&quot;female&quot;</span>, <span class="number">78</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Allon&quot;</span>, <span class="number">16</span>,<span class="string">&quot;female&quot;</span>, <span class="number">92</span>));</span><br><span class="line">students.add(<span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;Alis&quot;</span>, <span class="number">16</span>,<span class="string">&quot;female&quot;</span>, <span class="number">50</span>));</span><br><span class="line">Optional&lt;Student&gt; optional = students.stream().max(Comparator.comparing(r -&gt; r.getScore()));</span><br><span class="line">System.out.println(<span class="string">&quot;成绩最高的学生姓名：&quot;</span> + optional.get().getName());</span><br></pre></td></tr></table></figure>
+
+<p>输出结果：</p>
+<blockquote>
+<p>成绩最高的学生姓名：Lucy</p>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">chy_lua</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://dgggj.github.io/2022/04/15/Stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B/">https://dgggj.github.io/2022/04/15/Stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://dgggj.github.io" target="_blank">牧羊少年的代码之旅</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/java/">java</a><a class="post-meta__tags" href="/tags/Stream/">Stream</a></div><div class="post_share"><div class="social-share" data-image="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover9.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button"><i class="fas fa-qrcode"></i> 打赏</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/reward/weixin.jpeg" target="_blank"><img class="post-qr-code-img" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/reward/weixin.jpeg" alt="wechat"/></a><div class="post-qr-code-desc">wechat</div></li><li class="reward-item"><a href="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/reward/zhifubao.jpeg" target="_blank"><img class="post-qr-code-img" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/reward/zhifubao.jpeg" alt="alipay"/></a><div class="post-qr-code-desc">alipay</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2022/04/15/JVM-04%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%A0%88/"><img class="next-cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover7.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">JVM-04虚拟机栈</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/04/07/JVM-02%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/" title="JVM_02类加载子系统"><img class="cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover3.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-07</div><div class="title">JVM_02类加载子系统</div></div></a></div><div><a href="/2022/04/08/JVM-03%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/" title="JVM_03运行时数据区"><img class="cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover4.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-08</div><div class="title">JVM_03运行时数据区</div></div></a></div><div><a href="/2022/04/15/JVM-04%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%A0%88/" title="JVM-04虚拟机栈"><img class="cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover7.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-15</div><div class="title">JVM-04虚拟机栈</div></div></a></div><div><a href="/2022/04/03/spring5/" title="Spring5"><img class="cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/beijing.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-03</div><div class="title">Spring5</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%A6%81"><span class="toc-text">概要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E5%88%86%E7%B1%BB"><span class="toc-text">一分类</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E4%B8%AD%E9%97%B4%E6%93%8D%E4%BD%9C"><span class="toc-text">1中间操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E7%BB%93%E6%9D%9F%E6%93%8D%E4%BD%9C"><span class="toc-text">2结束操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3Stream%E6%B5%81%E7%9A%84%E4%B8%89%E7%A7%8D%E5%88%9B%E5%BB%BA%E6%96%B9%E5%BC%8F"><span class="toc-text">3Stream流的三种创建方式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E6%97%A0%E7%8A%B6%E6%80%81%E6%93%8D%E4%BD%9C"><span class="toc-text">二无状态操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-map"><span class="toc-text">2.1. map</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-mapToXXX"><span class="toc-text">2.2 mapToXXX</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-flatMap"><span class="toc-text">2.3 flatMap</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-flatMapToXXX"><span class="toc-text">2.4 flatMapToXXX</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-filter"><span class="toc-text">2.5 filter</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-peek"><span class="toc-text">2.6 peek</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-7-unordered"><span class="toc-text">2.7 unordered</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-%E6%9C%89%E7%8A%B6%E6%80%81%E6%93%8D%E4%BD%9C"><span class="toc-text">三 有状态操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-distinct"><span class="toc-text">3.1 distinct</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-limit"><span class="toc-text">3.2 limit</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-skip"><span class="toc-text">3.3 skip</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-sorted"><span class="toc-text">3.4 sorted</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E7%9F%AD%E8%B7%AF%E6%93%8D%E4%BD%9C"><span class="toc-text">四短路操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-findAny"><span class="toc-text">4.1 findAny</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-anyMatch"><span class="toc-text">4.2 anyMatch</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-allMatch"><span class="toc-text">4.3 allMatch</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-noneMatch"><span class="toc-text">4.4 noneMatch</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-5-findFirst"><span class="toc-text">4.5 findFirst</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E9%9D%9E%E7%9F%AD%E8%B7%AF%E6%93%8D%E4%BD%9C"><span class="toc-text">五非短路操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-forEach"><span class="toc-text">5.1 forEach</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-forEachOrdered"><span class="toc-text">5.2 forEachOrdered</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-toArray"><span class="toc-text">5.3 toArray</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-reduce"><span class="toc-text">5.4 reduce</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-5-collect"><span class="toc-text">5.5 collect</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#5-5-1-%E5%BD%92%E9%9B%86%E6%88%90%E6%96%B0%E9%9B%86%E5%90%88"><span class="toc-text">5.5.1 归集成新集合</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-5-2-%E7%BB%9F%E8%AE%A1%E5%8A%9F%E8%83%BD"><span class="toc-text">5.5.2 统计功能</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-5-3-%E5%88%86%E5%8C%BA%E5%92%8C%E5%88%86%E7%BB%84"><span class="toc-text">5.5.3 分区和分组</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-5-4-%E8%BF%9E%E6%8E%A5"><span class="toc-text">5.5.4 连接</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-5-5-%E8%A7%84%E7%BA%A6"><span class="toc-text">5.5.5 规约</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-6-max%E3%80%81min%E3%80%81count"><span class="toc-text">5.6 max、min、count</span></a></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By chy_lua</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">本地搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><script src="/js/search/local-search.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'D3Y3VWy1E6v4DoAxLrzURxcJ-gzGzoHsz',
+      appKey: 'uhb7m9SRGYt3VOuoNbD2HSzC',
+      avatar: 'monsterid',
+      serverURLs: 'https://d3y3vwy1.lc-cn-n1-shared.com',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script src="https://cdn.jsdelivr.net/npm/blueimp-md5/js/md5.min.js"></script><script>window.addEventListener('load', () => {
+  const changeContent = (content) => {
+    if (content === '') return content
+
+    content = content.replace(/<img.*?src="(.*?)"?[^\>]+>/ig, '[图片]') // replace image link
+    content = content.replace(/<a[^>]+?href=["']?([^"']+)["']?[^>]*>([^<]+)<\/a>/gi, '[链接]') // replace url
+    content = content.replace(/<pre><code>.*?<\/pre>/gi, '[代码]') // replace code
+    content = content.replace(/<[^>]+>/g,"") // remove html tag
+
+    if (content.length > 150) {
+      content = content.substring(0,150) + '...'
+    }
+    return content
+  }
+
+  const getIcon = (icon, mail) => {
+    if (icon) return icon
+    let defaultIcon = '?d=monsterid'
+    let iconUrl = `https://gravatar.loli.net/avatar/${md5(mail.toLowerCase()) + defaultIcon}`
+    return iconUrl
+  }
+
+  const generateHtml = array => {
+    let result = ''
+
+    if (array.length) {
+      for (let i = 0; i < array.length; i++) {
+        result += '<div class=\'aside-list-item\'>'
+
+        if (true) {
+          const name = 'src'
+          result += `<a href='${array[i].url}' class='thumbnail'><img ${name}='${array[i].avatar}' alt='${array[i].nick}'></a>`
+        }
+
+        result += `<div class='content'>
+        <a class='comment' href='${array[i].url}' title='${array[i].content}'>${array[i].content}</a>
+        <div class='name'><span>${array[i].nick} / </span><time datetime="${array[i].date}">${btf.diffDate(array[i].date, true)}</time></div>
+        </div></div>`
+      }
+    } else {
+      result += '没有评论'
+    }
+
+    let $dom = document.querySelector('#card-newest-comments .aside-list')
+    $dom.innerHTML= result
+    window.lazyLoadInstance && window.lazyLoadInstance.update()
+    window.pjax && window.pjax.refresh($dom)
+  }
+
+  const getComment = () => {
+    const serverURL = 'https://d3y3vwy1.lc-cn-n1-shared.com'
+
+    var settings = {
+      "method": "GET",
+      "headers": {
+        "X-LC-Id": 'D3Y3VWy1E6v4DoAxLrzURxcJ-gzGzoHsz',
+        "X-LC-Key": 'uhb7m9SRGYt3VOuoNbD2HSzC',
+        "Content-Type": "application/json"
+      },
+    }
+
+    fetch(`${serverURL}/1.1/classes/Comment?limit=6&order=-createdAt`,settings)
+      .then(response => response.json())
+      .then(data => {
+        const valineArray = data.results.map(function (e) {
+          return {
+            'avatar': getIcon(e.QQAvatar, e.mail),
+            'content': changeContent(e.comment),
+            'nick': e.nick,
+            'url': e.url + '#' + e.objectId,
+            'date': e.updatedAt,
+          }
+        })
+        saveToLocal.set('valine-newest-comments', JSON.stringify(valineArray), 10/(60*24))
+        generateHtml(valineArray)
+      }).catch(e => {
+        const $dom = document.querySelector('#card-newest-comments .aside-list')
+        $dom.innerHTML= "无法获取评论，请确认相关配置是否正确"
+      }) 
+  }
+
+  const newestCommentInit = () => {
+    if (document.querySelector('#card-newest-comments .aside-list')) {
+      const data = saveToLocal.get('valine-newest-comments')
+      if (data) {
+        generateHtml(JSON.parse(data))
+      } else {
+        getComment()
+      }
+    }
+  }
+
+  newestCommentInit()
+  document.addEventListener('pjax:complete', newestCommentInit)
+})</script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  typeof preloader === 'object' && preloader.initLoading()
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+
+  typeof preloader === 'object' && preloader.endLoading()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

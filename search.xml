@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>线程的六种状态（java）</title>
+      <link href="/2022/07/12/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%85%AD%E7%A7%8D%E7%8A%B6%E6%80%81%EF%BC%88java%EF%BC%89/"/>
+      <url>/2022/07/12/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%85%AD%E7%A7%8D%E7%8A%B6%E6%80%81%EF%BC%88java%EF%BC%89/</url>
+      
+        <content type="html"><![CDATA[<h3 id="1线程六种状态"><a href="#1线程六种状态" class="headerlink" title="1线程六种状态"></a>1线程六种状态</h3><ol><li>初始(NEW)：新创建了一个线程对象，但还没有调用start()方法。</li><li>运行(RUNNABLE)：Java线程中将就绪（ready）和运行中（running）两种状态笼统的称为“运行”。<br>线程对象创建后，其他线程(比如main线程）调用了该对象的start()方法。该状态的线程位于可运行线程池中，等待被线程调度选中，获取CPU的使用权，此时处于就绪状态（ready）。就绪状态的线程在获得CPU时间片后变为运行中状态（running）。</li><li>阻塞(BLOCKED)：表示线程阻塞于锁。</li><li>等待(WAITING)：进入该状态的线程需要等待其他线程做出一些特定动作（通知或中断）。</li><li>计时等待(TIMED_WAITING)：该状态不同于WAITING，它可以在指定的时间后自行返回。</li><li>终止(TERMINATED)：表示该线程已经执行完毕。</li></ol><p>可以通过getState()方法获取线程当前状态。任何线程当前只能属于一种状态。</p><p><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/java/JVM_03/19.jpeg" alt="19"></p><h4 id="1-初始状态-NEW"><a href="#1-初始状态-NEW" class="headerlink" title="1. 初始状态(NEW)"></a><strong>1. 初始状态(NEW)</strong></h4><p>实现Runnable接口和继承Thread可以得到一个线程类，new一个实例出来，线程就进入了初始状态。</p><h4 id="2运行状态"><a href="#2运行状态" class="headerlink" title="2运行状态"></a>2运行状态</h4><ul><li>就绪状态(RUNNABLE之READY)</li></ul><p>​        就绪状态只是说你资格运行，调度程序没有挑选到你，你就永远是就绪状态。<br>​        调用线程的start()方法，此线程进入就绪状态。<br>​        当前线程sleep()方法结束，其他线程join()结束，等待用户输入完毕，某个线程拿到对象锁，这些线程也将进入就绪状态。<br>​        当前线程时间片用完了，调用当前线程的yield()方法，当前线程进入就绪状态。<br>​        锁池里的线程拿到对象锁后，进入就绪状态。</p><ul><li><p><strong>运行中状态(RUNNABLE之RUNNING)</strong></p><p>线程调度程序从可运行池中选择一个线程作为当前线程时线程所处的状态。这也是线程进入运行状态的唯一的一种方式。</p></li></ul><h4 id="3被阻塞状态（Blocked）"><a href="#3被阻塞状态（Blocked）" class="headerlink" title="3被阻塞状态（Blocked）"></a>3被阻塞状态（Blocked）</h4><p>从Runnable状态进入Blocked状态只有一种途径，就是进入到Synchronized代码块中未获得相应的monitor锁。</p><h4 id="4等待状态-Waiting"><a href="#4等待状态-Waiting" class="headerlink" title="4等待状态(Waiting)"></a>4等待状态(Waiting)</h4><p>waiting方法的进入方式有三种：</p><p>1）当线程中调用了没有设置TimeOut参数的Object.wait()方法</p><p>2）调用Thread.join方法</p><p>3）调用了LockSupport.park()方法</p><blockquote><p>关于LockSupport.park()方法，Blocked是针对synchronized中monitor锁的，但在java中还有其他锁。比如说ReentrantLock等，在这些线程中，如果线程没有获取到锁会直接进入waiting状态，其实这种方法本质就是使用LockSupport.park()方法进入waiting状态</p></blockquote><ul><li>Blocked与waiting的区别<ul><li>Blocked是在等待其他线程释放monitor锁</li><li>waiting则是在等待某个条件。比如说join的线程执行完毕或者是notify()或者notifyAll()</li></ul></li></ul><h4 id="5计时等待状态-Timed-Waiting"><a href="#5计时等待状态-Timed-Waiting" class="headerlink" title="5计时等待状态(Timed Waiting)"></a>5计时等待状态(Timed Waiting)</h4><p>和waiting状态相似，区别在于是否有时间限制。Timed waiting 状态时会等待超时，之后由系统唤醒，也可以提前通知唤醒notify().</p><p>线程进入Timed Waiting状态：</p><ol><li>线程执行了设置参数的Thread.sleep(long millis)方法;</li></ol><ol start="2"><li>线程执行了设置参数的Object.wait(long timeout)方法；</li><li>线程执行了设置参数的Thread.join(long millis)方法；</li><li>线程执行了设置参数的LockSupport.parkNanos(long nanos)方法和LockSupport.parkUntil(long deadline)方法</li></ol><h3 id="2-线程状态间的相互转换"><a href="#2-线程状态间的相互转换" class="headerlink" title="2.线程状态间的相互转换"></a>2.线程状态间的相互转换</h3><p>主要为Blocked、waiting、Time waiting三种状态的转换，以及他们时如何进入下一个状态最终进入Runnable</p><h4 id="Blocked进入Runnable"><a href="#Blocked进入Runnable" class="headerlink" title="Blocked进入Runnable"></a>Blocked进入Runnable</h4><ul><li>想要Blocked状态进入Runnable状态，需要获得monitor锁。但如果想进入到其他状态比较特殊，因为它没有超时机制，所以不会主动进入</li></ul><h4 id="Waiting-进入Runnable-状态"><a href="#Waiting-进入Runnable-状态" class="headerlink" title="Waiting 进入Runnable 状态"></a>Waiting 进入Runnable 状态</h4><ul><li><p>只有当执行了LockSupport.unpark()，或者join的线程运行结束、或者被中断时才可以进入Runnable状态</p></li><li><p>如果其他线程通过调用notify()或者notifyAll()来唤醒它，则它会直接进入Blocked()状态。这是因为唤醒waiting线程的线程调用notify()或者notifyAll().必须要求持有monitor锁，也就是说wait()、notify()方法必须在Synchronized代码块中</p></li><li><p>所以处于waiting状态的线程被唤醒时拿不到该锁，就会进入到Blocked状态。直到执行了notify()&#x2F;notifyAll()方法的线程执行完毕后释放monitor锁。才有可能轮到它去抢夺这把锁.如果抢到。就会从Blocked状态回到Runnable状态</p></li></ul><p>对于Timed Waiting而言，它存在超时机制，也就是说如果超时时间到了那么就会系统自动直接拿到锁，或者join的线程执行结束&#x2F;调用了LockSupport.unpark()&#x2F;被中断等情况都会直接进入runnable</p><h3 id="6Terminated终止"><a href="#6Terminated终止" class="headerlink" title="6Terminated终止"></a>6Terminated终止</h3><p>想要进入这种状态只有两种方法：</p><ul><li>run()方法执行完毕</li><li>出现一个没有捕获的异常，终止了run()方法，最终意外终止</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 面试题 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> java </tag>
+            
+            <tag> 面试题 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Stream流式编程</title>
       <link href="/2022/04/15/Stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B/"/>
       <url>/2022/04/15/Stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B/</url>

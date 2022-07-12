@@ -1,0 +1,417 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>线程的六种状态（java） | 牧羊少年的代码之旅</title><meta name="keywords" content="java,面试题"><meta name="author" content="chy_lua"><meta name="copyright" content="chy_lua"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="1线程六种状态 初始(NEW)：新创建了一个线程对象，但还没有调用start()方法。 运行(RUNNABLE)：Java线程中将就绪（ready）和运行中（running）两种状态笼统的称为“运行”。线程对象创建后，其他线程(比如main线程）调用了该对象的start()方法。该状态的线程位于可运行线程池中，等待被线程调度选中，获取CPU的使用权，此时处于就绪状态（ready）。就绪状态的线程在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线程的六种状态（java）">
+<meta property="og:url" content="https://dgggj.github.io/2022/07/12/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%85%AD%E7%A7%8D%E7%8A%B6%E6%80%81%EF%BC%88java%EF%BC%89/index.html">
+<meta property="og:site_name" content="牧羊少年的代码之旅">
+<meta property="og:description" content="1线程六种状态 初始(NEW)：新创建了一个线程对象，但还没有调用start()方法。 运行(RUNNABLE)：Java线程中将就绪（ready）和运行中（running）两种状态笼统的称为“运行”。线程对象创建后，其他线程(比如main线程）调用了该对象的start()方法。该状态的线程位于可运行线程池中，等待被线程调度选中，获取CPU的使用权，此时处于就绪状态（ready）。就绪状态的线程在">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover3.jpg">
+<meta property="article:published_time" content="2022-07-12T15:17:12.000Z">
+<meta property="article:modified_time" content="2022-07-12T15:31:45.726Z">
+<meta property="article:author" content="chy_lua">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="面试题">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover3.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://dgggj.github.io/2022/07/12/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%85%AD%E7%A7%8D%E7%8A%B6%E6%80%81%EF%BC%88java%EF%BC%89/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '线程的六种状态（java）',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-07-12 23:31:45'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="https://csdn.jsdeliver.net/gh/constown/HexoCustomFile@0.0.4/dist/css/custom.min.css"><meta name="generator" content="Hexo 6.1.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/touxiang.jpeg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">11</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友人帐</span></a></li><li><a class="site-page child" href="/share/"><i class="fa-fw fas fa-share"></i><span> 分享</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/messageboard/"><i class="fa-fw fas fa-comment-dots"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user-tag"></i><span> 关于作者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover3.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">牧羊少年的代码之旅</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友人帐</span></a></li><li><a class="site-page child" href="/share/"><i class="fa-fw fas fa-share"></i><span> 分享</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/messageboard/"><i class="fa-fw fas fa-comment-dots"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user-tag"></i><span> 关于作者</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">线程的六种状态（java）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-07-12T15:17:12.000Z" title="发表于 2022-07-12 23:17:12">2022-07-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-07-12T15:31:45.726Z" title="更新于 2022-07-12 23:31:45">2022-07-12</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%9D%A2%E8%AF%95%E9%A2%98/">面试题</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.2k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>3分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="线程的六种状态（java）"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h3 id="1线程六种状态"><a href="#1线程六种状态" class="headerlink" title="1线程六种状态"></a>1线程六种状态</h3><ol>
+<li>初始(NEW)：新创建了一个线程对象，但还没有调用start()方法。</li>
+<li>运行(RUNNABLE)：Java线程中将就绪（ready）和运行中（running）两种状态笼统的称为“运行”。<br>线程对象创建后，其他线程(比如main线程）调用了该对象的start()方法。该状态的线程位于可运行线程池中，等待被线程调度选中，获取CPU的使用权，此时处于就绪状态（ready）。就绪状态的线程在获得CPU时间片后变为运行中状态（running）。</li>
+<li>阻塞(BLOCKED)：表示线程阻塞于锁。</li>
+<li>等待(WAITING)：进入该状态的线程需要等待其他线程做出一些特定动作（通知或中断）。</li>
+<li>计时等待(TIMED_WAITING)：该状态不同于WAITING，它可以在指定的时间后自行返回。</li>
+<li>终止(TERMINATED)：表示该线程已经执行完毕。</li>
+</ol>
+<p>可以通过getState()方法获取线程当前状态。任何线程当前只能属于一种状态。</p>
+<p><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/java/JVM_03/19.jpeg" alt="19"></p>
+<h4 id="1-初始状态-NEW"><a href="#1-初始状态-NEW" class="headerlink" title="1. 初始状态(NEW)"></a><strong>1. 初始状态(NEW)</strong></h4><p>实现Runnable接口和继承Thread可以得到一个线程类，new一个实例出来，线程就进入了初始状态。</p>
+<h4 id="2运行状态"><a href="#2运行状态" class="headerlink" title="2运行状态"></a>2运行状态</h4><ul>
+<li>就绪状态(RUNNABLE之READY)</li>
+</ul>
+<p>​        就绪状态只是说你资格运行，调度程序没有挑选到你，你就永远是就绪状态。<br>​        调用线程的start()方法，此线程进入就绪状态。<br>​        当前线程sleep()方法结束，其他线程join()结束，等待用户输入完毕，某个线程拿到对象锁，这些线程也将进入就绪状态。<br>​        当前线程时间片用完了，调用当前线程的yield()方法，当前线程进入就绪状态。<br>​        锁池里的线程拿到对象锁后，进入就绪状态。</p>
+<ul>
+<li><p><strong>运行中状态(RUNNABLE之RUNNING)</strong></p>
+<p>线程调度程序从可运行池中选择一个线程作为当前线程时线程所处的状态。这也是线程进入运行状态的唯一的一种方式。</p>
+</li>
+</ul>
+<h4 id="3被阻塞状态（Blocked）"><a href="#3被阻塞状态（Blocked）" class="headerlink" title="3被阻塞状态（Blocked）"></a>3被阻塞状态（Blocked）</h4><p>从Runnable状态进入Blocked状态只有一种途径，就是进入到Synchronized代码块中未获得相应的monitor锁。</p>
+<h4 id="4等待状态-Waiting"><a href="#4等待状态-Waiting" class="headerlink" title="4等待状态(Waiting)"></a>4等待状态(Waiting)</h4><p>waiting方法的进入方式有三种：</p>
+<p>1）当线程中调用了没有设置TimeOut参数的Object.wait()方法</p>
+<p>2）调用Thread.join方法</p>
+<p>3）调用了LockSupport.park()方法</p>
+<blockquote>
+<p>关于LockSupport.park()方法，Blocked是针对synchronized中monitor锁的，但在java中还有其他锁。比如说ReentrantLock等，在这些线程中，如果线程没有获取到锁会直接进入waiting状态，其实这种方法本质就是使用LockSupport.park()方法进入waiting状态</p>
+</blockquote>
+<ul>
+<li>Blocked与waiting的区别<ul>
+<li>Blocked是在等待其他线程释放monitor锁</li>
+<li>waiting则是在等待某个条件。比如说join的线程执行完毕或者是notify()或者notifyAll()</li>
+</ul>
+</li>
+</ul>
+<h4 id="5计时等待状态-Timed-Waiting"><a href="#5计时等待状态-Timed-Waiting" class="headerlink" title="5计时等待状态(Timed Waiting)"></a>5计时等待状态(Timed Waiting)</h4><p>和waiting状态相似，区别在于是否有时间限制。Timed waiting 状态时会等待超时，之后由系统唤醒，也可以提前通知唤醒notify().</p>
+<p>线程进入Timed Waiting状态：</p>
+<ol>
+<li>线程执行了设置参数的Thread.sleep(long millis)方法;</li>
+</ol>
+<ol start="2">
+<li>线程执行了设置参数的Object.wait(long timeout)方法；</li>
+<li>线程执行了设置参数的Thread.join(long millis)方法；</li>
+<li>线程执行了设置参数的LockSupport.parkNanos(long nanos)方法和LockSupport.parkUntil(long deadline)方法</li>
+</ol>
+<h3 id="2-线程状态间的相互转换"><a href="#2-线程状态间的相互转换" class="headerlink" title="2.线程状态间的相互转换"></a>2.线程状态间的相互转换</h3><p>主要为Blocked、waiting、Time waiting三种状态的转换，以及他们时如何进入下一个状态最终进入Runnable</p>
+<h4 id="Blocked进入Runnable"><a href="#Blocked进入Runnable" class="headerlink" title="Blocked进入Runnable"></a>Blocked进入Runnable</h4><ul>
+<li>想要Blocked状态进入Runnable状态，需要获得monitor锁。但如果想进入到其他状态比较特殊，因为它没有超时机制，所以不会主动进入</li>
+</ul>
+<h4 id="Waiting-进入Runnable-状态"><a href="#Waiting-进入Runnable-状态" class="headerlink" title="Waiting 进入Runnable 状态"></a>Waiting 进入Runnable 状态</h4><ul>
+<li><p>只有当执行了LockSupport.unpark()，或者join的线程运行结束、或者被中断时才可以进入Runnable状态</p>
+</li>
+<li><p>如果其他线程通过调用notify()或者notifyAll()来唤醒它，则它会直接进入Blocked()状态。这是因为唤醒waiting线程的线程调用notify()或者notifyAll().必须要求持有monitor锁，也就是说wait()、notify()方法必须在Synchronized代码块中</p>
+</li>
+<li><p>所以处于waiting状态的线程被唤醒时拿不到该锁，就会进入到Blocked状态。直到执行了notify()&#x2F;notifyAll()方法的线程执行完毕后释放monitor锁。才有可能轮到它去抢夺这把锁.如果抢到。就会从Blocked状态回到Runnable状态</p>
+</li>
+</ul>
+<p>对于Timed Waiting而言，它存在超时机制，也就是说如果超时时间到了那么就会系统自动直接拿到锁，或者join的线程执行结束&#x2F;调用了LockSupport.unpark()&#x2F;被中断等情况都会直接进入runnable</p>
+<h3 id="6Terminated终止"><a href="#6Terminated终止" class="headerlink" title="6Terminated终止"></a>6Terminated终止</h3><p>想要进入这种状态只有两种方法：</p>
+<ul>
+<li>run()方法执行完毕</li>
+<li>出现一个没有捕获的异常，终止了run()方法，最终意外终止</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">chy_lua</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://dgggj.github.io/2022/07/12/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%85%AD%E7%A7%8D%E7%8A%B6%E6%80%81%EF%BC%88java%EF%BC%89/">https://dgggj.github.io/2022/07/12/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%85%AD%E7%A7%8D%E7%8A%B6%E6%80%81%EF%BC%88java%EF%BC%89/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://dgggj.github.io" target="_blank">牧羊少年的代码之旅</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/java/">java</a><a class="post-meta__tags" href="/tags/%E9%9D%A2%E8%AF%95%E9%A2%98/">面试题</a></div><div class="post_share"><div class="social-share" data-image="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover3.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button"><i class="fas fa-qrcode"></i> 打赏</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/reward/weixin.jpeg" target="_blank"><img class="post-qr-code-img" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/reward/weixin.jpeg" alt="wechat"/></a><div class="post-qr-code-desc">wechat</div></li><li class="reward-item"><a href="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/reward/zhifubao.jpeg" target="_blank"><img class="post-qr-code-img" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/reward/zhifubao.jpeg" alt="alipay"/></a><div class="post-qr-code-desc">alipay</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2022/04/15/Stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B/"><img class="next-cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover9.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Stream流式编程</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/04/07/JVM-02%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/" title="JVM_02类加载子系统"><img class="cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover3.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-07</div><div class="title">JVM_02类加载子系统</div></div></a></div><div><a href="/2022/04/08/JVM-03%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/" title="JVM_03运行时数据区"><img class="cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover4.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-08</div><div class="title">JVM_03运行时数据区</div></div></a></div><div><a href="/2022/04/15/Stream%E6%B5%81%E5%BC%8F%E7%BC%96%E7%A8%8B/" title="Stream流式编程"><img class="cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover9.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-15</div><div class="title">Stream流式编程</div></div></a></div><div><a href="/2022/04/03/spring5/" title="Spring5"><img class="cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/beijing.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-03</div><div class="title">Spring5</div></div></a></div><div><a href="/2022/04/15/JVM-04%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%A0%88/" title="JVM-04虚拟机栈"><img class="cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover7.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-15</div><div class="title">JVM-04虚拟机栈</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E7%BA%BF%E7%A8%8B%E5%85%AD%E7%A7%8D%E7%8A%B6%E6%80%81"><span class="toc-text">1线程六种状态</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%88%9D%E5%A7%8B%E7%8A%B6%E6%80%81-NEW"><span class="toc-text">1. 初始状态(NEW)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E8%BF%90%E8%A1%8C%E7%8A%B6%E6%80%81"><span class="toc-text">2运行状态</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3%E8%A2%AB%E9%98%BB%E5%A1%9E%E7%8A%B6%E6%80%81%EF%BC%88Blocked%EF%BC%89"><span class="toc-text">3被阻塞状态（Blocked）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4%E7%AD%89%E5%BE%85%E7%8A%B6%E6%80%81-Waiting"><span class="toc-text">4等待状态(Waiting)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5%E8%AE%A1%E6%97%B6%E7%AD%89%E5%BE%85%E7%8A%B6%E6%80%81-Timed-Waiting"><span class="toc-text">5计时等待状态(Timed Waiting)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81%E9%97%B4%E7%9A%84%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2"><span class="toc-text">2.线程状态间的相互转换</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Blocked%E8%BF%9B%E5%85%A5Runnable"><span class="toc-text">Blocked进入Runnable</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Waiting-%E8%BF%9B%E5%85%A5Runnable-%E7%8A%B6%E6%80%81"><span class="toc-text">Waiting 进入Runnable 状态</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6Terminated%E7%BB%88%E6%AD%A2"><span class="toc-text">6Terminated终止</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By chy_lua</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">本地搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><script src="/js/search/local-search.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'D3Y3VWy1E6v4DoAxLrzURxcJ-gzGzoHsz',
+      appKey: 'uhb7m9SRGYt3VOuoNbD2HSzC',
+      avatar: 'monsterid',
+      serverURLs: 'https://d3y3vwy1.lc-cn-n1-shared.com',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script src="https://cdn.jsdelivr.net/npm/blueimp-md5/js/md5.min.js"></script><script>window.addEventListener('load', () => {
+  const changeContent = (content) => {
+    if (content === '') return content
+
+    content = content.replace(/<img.*?src="(.*?)"?[^\>]+>/ig, '[图片]') // replace image link
+    content = content.replace(/<a[^>]+?href=["']?([^"']+)["']?[^>]*>([^<]+)<\/a>/gi, '[链接]') // replace url
+    content = content.replace(/<pre><code>.*?<\/pre>/gi, '[代码]') // replace code
+    content = content.replace(/<[^>]+>/g,"") // remove html tag
+
+    if (content.length > 150) {
+      content = content.substring(0,150) + '...'
+    }
+    return content
+  }
+
+  const getIcon = (icon, mail) => {
+    if (icon) return icon
+    let defaultIcon = '?d=monsterid'
+    let iconUrl = `https://gravatar.loli.net/avatar/${md5(mail.toLowerCase()) + defaultIcon}`
+    return iconUrl
+  }
+
+  const generateHtml = array => {
+    let result = ''
+
+    if (array.length) {
+      for (let i = 0; i < array.length; i++) {
+        result += '<div class=\'aside-list-item\'>'
+
+        if (true) {
+          const name = 'src'
+          result += `<a href='${array[i].url}' class='thumbnail'><img ${name}='${array[i].avatar}' alt='${array[i].nick}'></a>`
+        }
+
+        result += `<div class='content'>
+        <a class='comment' href='${array[i].url}' title='${array[i].content}'>${array[i].content}</a>
+        <div class='name'><span>${array[i].nick} / </span><time datetime="${array[i].date}">${btf.diffDate(array[i].date, true)}</time></div>
+        </div></div>`
+      }
+    } else {
+      result += '没有评论'
+    }
+
+    let $dom = document.querySelector('#card-newest-comments .aside-list')
+    $dom.innerHTML= result
+    window.lazyLoadInstance && window.lazyLoadInstance.update()
+    window.pjax && window.pjax.refresh($dom)
+  }
+
+  const getComment = () => {
+    const serverURL = 'https://d3y3vwy1.lc-cn-n1-shared.com'
+
+    var settings = {
+      "method": "GET",
+      "headers": {
+        "X-LC-Id": 'D3Y3VWy1E6v4DoAxLrzURxcJ-gzGzoHsz',
+        "X-LC-Key": 'uhb7m9SRGYt3VOuoNbD2HSzC',
+        "Content-Type": "application/json"
+      },
+    }
+
+    fetch(`${serverURL}/1.1/classes/Comment?limit=6&order=-createdAt`,settings)
+      .then(response => response.json())
+      .then(data => {
+        const valineArray = data.results.map(function (e) {
+          return {
+            'avatar': getIcon(e.QQAvatar, e.mail),
+            'content': changeContent(e.comment),
+            'nick': e.nick,
+            'url': e.url + '#' + e.objectId,
+            'date': e.updatedAt,
+          }
+        })
+        saveToLocal.set('valine-newest-comments', JSON.stringify(valineArray), 10/(60*24))
+        generateHtml(valineArray)
+      }).catch(e => {
+        const $dom = document.querySelector('#card-newest-comments .aside-list')
+        $dom.innerHTML= "无法获取评论，请确认相关配置是否正确"
+      }) 
+  }
+
+  const newestCommentInit = () => {
+    if (document.querySelector('#card-newest-comments .aside-list')) {
+      const data = saveToLocal.get('valine-newest-comments')
+      if (data) {
+        generateHtml(JSON.parse(data))
+      } else {
+        getComment()
+      }
+    }
+  }
+
+  newestCommentInit()
+  document.addEventListener('pjax:complete', newestCommentInit)
+})</script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  typeof preloader === 'object' && preloader.initLoading()
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+
+  typeof preloader === 'object' && preloader.endLoading()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

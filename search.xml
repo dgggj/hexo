@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>Java内存模型-JMM</title>
+      <link href="/2022/08/03/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B-JMM/"/>
+      <url>/2022/08/03/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B-JMM/</url>
+      
+        <content type="html"><![CDATA[<h2 id="JMM"><a href="#JMM" class="headerlink" title="JMM"></a>JMM</h2><h3 id="1-什么是JMM"><a href="#1-什么是JMM" class="headerlink" title="1.什么是JMM?"></a>1.什么是JMM?</h3><p>JMM(java内存模型)是一种符合计算机内存模型规范的，屏蔽了各种硬件和操作系统的访问内存差异的，保证java程序在各种平台下对内存的访问都能得到一致性效果的一种机制以及规范。目的是解决多线程通过内存共享进行通讯时存在的一些原子性、有序性、可见性的问题</p><p>每个线程的工作内存都是独立的，线程操作数据只能在工作内存中进行，然后刷回到主存。这是 Java 内存模型定义的线程基本工作方式。<img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/jmm/1.png" alt="1"></p><p>整个Java内存模型实际上是围绕着三个特征建立起来的。分别是：原子性，可见性，有序性。这三个特征可谓是整个Java并发的基础。</p><h3 id="2-三大特性"><a href="#2-三大特性" class="headerlink" title="2.三大特性"></a>2.三大特性</h3><h4 id="2-1原子性"><a href="#2-1原子性" class="headerlink" title="2.1原子性"></a>2.1原子性</h4><p>原子性指的是一个操作是不可分割，不可中断的，一个线程在执行时不会被其他线程干扰</p><p>如</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> i=<span class="number">2</span>;  <span class="comment">//原子性</span></span><br><span class="line"><span class="type">int</span> j=i;  <span class="comment">//先读取i的值，再赋值到j，两步操作，不能保证原子性</span></span><br><span class="line">i++;  <span class="comment">//不能保证原子性</span></span><br><span class="line">i=i+<span class="number">1</span>;  <span class="comment">//不能保证原子性</span></span><br></pre></td></tr></table></figure><p>JMM只能保证基本的原子性，如果要保证一个代码块的原子性，提供了monitorenter 和 moniterexit 两个字节码指令，也就是 synchronized 关键字。因此在 synchronized 块之间的操作都是原子性的。</p><h4 id="2-2-可见性"><a href="#2-2-可见性" class="headerlink" title="2.2 可见性"></a>2.2 可见性</h4><p>可见性指当一个线程修改共享变量的值，其他线程能够立即知道被修改。</p><p>Java是利用volatile关键字来提供可见性的。 当变量被volatile修饰时，这个变量被修改后会立刻刷新到主内存，当其它线程需要读取该变量时，会去主内存中读取新值。而普通变量则不能保证这一点。</p><p>除了volatile关键字之外，final和synchronized也能实现可见性。</p><p>synchronized的原理是，在执行完，进入unlock之前，必须将共享变量同步到主内存中。</p><p>final修饰的字段，一旦初始化完成，如果没有对象逸出（指对象为初始化完成就可以被别的线程使用），那么对于其他线程都是可见的。</p><h4 id="2-3-有序性"><a href="#2-3-有序性" class="headerlink" title="2.3 有序性"></a>2.3 有序性</h4><p>在Java中，可以使用synchronized或者volatile保证多线程之间操作的有序性。实现原理有些区别：</p><p>volatile关键字是使用内存屏障达到禁止指令重排序，以保证有序性。</p><p>synchronized的原理是，一个线程lock之后，必须unlock后，其他线程才可以重新lock，使得被synchronized包住的代码块在多线程之间是串行执行的。</p><h3 id="3-八种内存交互操作"><a href="#3-八种内存交互操作" class="headerlink" title="3 八种内存交互操作"></a>3 八种内存交互操作</h3><p><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/jmm/2.png" alt="2"></p><ul><li>lock(锁定)，作用于<strong>主内存</strong>中的变量，把变量标识为线程独占的状态。</li><li>read(读取)，作用于<strong>主内存</strong>的变量，把变量的值从主内存传输到线程的工作内存中，以便下一步的load操作使用。</li><li>load(加载)，作用于<strong>工作内存</strong>的变量，把read操作主存的变量放入到工作内存的变量副本中。</li><li>use(使用)，作用于<strong>工作内存</strong>的变量，把工作内存中的变量传输到执行引擎，每当虚拟机遇到一个需要使用到变量的值的字节码指令时将会执行这个操作。</li><li>assign(赋值)，作用于<strong>工作内存</strong>的变量，它把一个从执行引擎中接受到的值赋值给工作内存的变量副本中，每当虚拟机遇到一个给变量赋值的字节码指令时将会执行这个操作。</li><li>store(存储)，作用于<strong>工作内存</strong>的变量，它把一个从工作内存中一个变量的值传送到主内存中，以便后续的write使用。</li><li>write(写入)：作用于<strong>主内存</strong>中的变量，它把store操作从工作内存中得到的变量的值放入主内存的变量中。</li><li>unlock(解锁)：作用于<strong>主内存</strong>的变量，它把一个处于锁定状态的变量释放出来，释放后的变量才可以被其他线程锁定。</li></ul><p>补充：</p><ul><li>不允许read、load、store、write操作之一单独出现，也就是read操作后必须load，store操作后必须write。</li><li>不允许线程丢弃他最近的assign操作，即工作内存中的变量数据改变了之后，必须告知主存。</li><li>不允许线程将没有assign的数据从工作内存同步到主内存。</li><li>一个新的变量必须在主内存中诞生，不允许工作内存直接使用一个未被初始化的变量。就是对变量实施use、store操作之前，必须经过load和assign操作。</li><li>一个变量同一时间只能有一个线程对其进行lock操作。多次lock之后，必须执行相同次数unlock才可以解锁。</li><li>如果对一个变量进行lock操作，会清空所有工作内存中此变量的值。在执行引擎使用这个变量前，必须重新load或assign操作初始化变量的值。</li><li>如果一个变量没有被lock，就不能对其进行unlock操作。也不能unlock一个被其他线程锁住的变量。</li><li>一个线程对一个变量进行unlock操作之前，必须先把此变量同步回主内存。</li></ul><h3 id="4-volatile关键词"><a href="#4-volatile关键词" class="headerlink" title="4 volatile关键词"></a>4 volatile关键词</h3><ol><li><strong>保证线程间变量的可见性。</strong></li><li>禁止CPU进行指令重排序。</li></ol><ul><li>可见性</li></ul><p>volatile修饰的变量，当一个线程改变了该变量的值，其他线程是立即可见的。普通变量则需要重新读取才能获得最新值。</p><p>保证可见性的流程为：</p><p><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/jmm/3.png" alt="3"></p><p>volatile不能保证线程安全,可见性不能保证操作的原子性</p><ul><li>禁止指令重排序</li></ul><p>首先要讲一下as-if-serial语义，不管怎么重排序，（单线程）程序的执行结果不能被改变。</p><p>为了使指令更加符合CPU的执行特性，最大限度的发挥机器的性能，提高程序的执行效率，只要程序的最终结果与它顺序化情况的结果相等，那么指令的执行顺序可以与代码逻辑顺序不一致，这个过程就叫做<strong>指令的重排序</strong>。</p><p>重排序的种类分为三种，分别是：编译器重排序，指令级并行的重排序，内存系统重排序。整个过程如下所示：</p><p><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/jmm/4.png" alt="4"></p><p>指令重排序在单线程是没有问题的，不会影响执行结果，而且还提高了性能。但是在多线程的环境下就不能保证一定不会影响执行结果了。</p><p><strong>所以在多线程环境下，就需要禁止指令重排序</strong>。</p><p>volatile关键字禁止指令重排序有两层意思：</p><ul><li>当程序执行到volatile变量的读操作或者写操作时，在其前面的操作的更改肯定全部已经进行，且结果已经对后面的操作可见，在其后面的操作肯定还没有进行。</li><li>在进行指令优化时，不能将在对volatile变量访问的语句放在其后面执行，也不能把volatile变量后面的语句放到其前面执行。</li></ul><p>volatile禁止指令重排序的原理是什么</p><p>首先要讲一下内存屏障，内存屏障可以分为以下几类：</p><ul><li>LoadLoad 屏障：对于这样的语句Load1，LoadLoad，Load2。在Load2及后续读取操作要读取的数据被访问前，保证Load1要读取的数据被读取完毕。</li><li>StoreStore屏障：对于这样的语句Store1， StoreStore， Store2，在Store2及后续写入操作执行前，保证Store1的写入操作对其它处理器可见。</li><li>LoadStore 屏障：对于这样的语句Load1， LoadStore，Store2，在Store2及后续写入操作被刷出前，保证Load1要读取的数据被读取完毕。</li><li>StoreLoad 屏障：对于这样的语句Store1， StoreLoad，Load2，在Load2及后续所有读取操作执行前，保证Store1的写入对所有处理器可见。</li></ul><p>在每个volatile读操作后插入LoadLoad屏障，在读操作后插入LoadStore屏障。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 面试题 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> java </tag>
+            
+            <tag> 面试题 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>23种设计模式</title>
       <link href="/2022/07/27/23%E7%A7%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"/>
       <url>/2022/07/27/23%E7%A7%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</url>

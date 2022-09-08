@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>面试1</title>
+      <link href="/2022/09/08/%E9%9D%A2%E8%AF%951/"/>
+      <url>/2022/09/08/%E9%9D%A2%E8%AF%951/</url>
+      
+        <content type="html"><![CDATA[<h4 id="1-数据库和缓存一致性"><a href="#1-数据库和缓存一致性" class="headerlink" title="1.数据库和缓存一致性"></a>1.数据库和缓存一致性</h4><p>1.命中：程序从缓存中读取数据，如果命中，则直接返回</p><p>2.失效：程序从缓存中读取数据，如果没有命中，则从数据库中读取，成功之后将数据放到缓存中</p><p>3.更新：程序先更新更新数据库，再删除缓存。</p><p>更新：</p><p>1.先更新缓存，再更新数据库。</p><p>如果先更新缓存，但更新数据库的时候失败了，这个时候需要回滚，也要把Redis缓存的回滚了，但Redis的缓存有可能是做过很多计算才得到缓存在里面，如果回滚，那就白算了。</p><p>2.先更新数据库，再更新缓存。</p><p><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/java/mianshi/huancun.png" alt="huancun"></p><p>如上图所示，如果线程A更新完数据库，CPU的资源被线程2获得，并执行更新数据库和缓存，线程1再获取cpu资源时更新了缓存，最终会出现数据库为2缓存是1的状况。此时缓存中的1是脏数据。</p><p>（3）先删除缓存，再更新数据库</p><p><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/java/mianshi/huancun2.png" alt="huancun"></p><p>线程A先删除缓存后，Cpu资源就被线程B获得，线程B在缓存中找不到数据，就去数据库中读取旧值，线程A又获取cpu，把A&#x3D;2更新到数据库中。线程B再获取cpu资源，他要把A&#x3D;1写到缓存中。此时数据库为2，缓存为1</p><p>（4）先更新数据库，再删除缓存</p><p>也会出现一些问题，但机率有点小,因为读的速度一般会比更新速度快。</p><p><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/java/mianshi/huancun3.png" alt="3"></p><p>可以过几秒再删除一次，延迟双删。</p><p>Mysql读写分离（主从架构）</p><p>可能出现的问题：</p><p><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/java/mianshi/cun5.png" alt="mysql"></p><p>增加一个订阅binlogin系统，订阅主数据库的binlog，那么这个服务系统内的数据一定是最新的，而且还是有序的。用这个系统更新redis就不会有。万一更新失败，又创建一个消息队列，把更新的数据丢到消息队列中。消息队列失败是可以重新发送的。</p><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/java/mianshi/cun4.png" alt="5" style="zoom:67%;" /><h4 id="2抽象类和接口的异同"><a href="#2抽象类和接口的异同" class="headerlink" title="2抽象类和接口的异同"></a>2抽象类和接口的异同</h4><ul><li>抽象类和接口都是为了将方法进行抽象，然后让子类去实现。所以可以定义抽象方法就是它们两者第一个相同点。这些父类是没有必要创建实例对象的，所以他们不创建本类对象，只能由子类去实例化子类对象。</li><li>子类想要拓展它们时，对抽象类使用的是extends关键词-继承，对接口使用implements关键词-实现，一个类最多只能继承一个父类，可以实现多个接口。这样如果发现既可以使用抽象类，也可以使用接口时，尽量使用接口，子类的灵活度会更高。</li><li>接口比抽象类更纯粹因为它没有成员属性，只有方法子类实现接口后只能做重写方法，子类继承抽象类后，还将抽象类的成员属性也继承了。抽象类可以定义成员属性，接口不能定义成员属性。只能定义静态属性，而且只能用final修饰定义静态常量。接口中也没有构造器。总的来说接口是只有方法和静态常量的类</li><li>抽象类可以定义构造方法，这是为了限制子类，如果子类继承就必须传入这些参数。</li></ul><p>java1.8之后。接口可以构造静态方法和default方法。因为java1.8添加很多方法，那么它的子类就必须全都要实现这些方法。定义为default方法之后它就不是抽象方法，因此不需要去实现</p><p>总结：</p><p>接口就是更加纯粹的抽象类，接口中只能是静态常量和抽象方法。java1.8添加（default方法和静态方法），java9出现private方法。接口不能继承类，但可以继承多个接口。抽象类中可以由构造器、抽象方法、普通成员方法、成员变量、静态方法、静态变量、常量。</p><p>如果你需要让子类继承父类的成员变量或者需要控制子类的实例化时使用抽象类。</p><h4 id="3-final关键词"><a href="#3-final关键词" class="headerlink" title="3 final关键词"></a>3 final关键词</h4><ul><li>final用在类上表示这个类不能被继承</li><li>final修饰方法表示这个方法不能被子类重写</li><li>final修饰变量则该变量被赋值后不能被修改，无论成员变量、局部变量都一样</li><li>如果修饰引用类型，则代表这个引用只有一次指向对象的机会，但对象的成员属性可以修改。</li></ul><p>、</p><h4 id="4-static关键词"><a href="#4-static关键词" class="headerlink" title="4 static关键词"></a>4 static关键词</h4><p>static的作用：1.静态属性。2.静态方法。3静态代码块。4静态导包</p><p>定义属性和方法时，加上static关键词变成静态属性和静态代码块。不用创建对象，直接通过类名便可以调用这个属性和方法，不需要创建。静态属性和方法属于类，成员属性和类属于对象。</p><p>静态代码块在类初始化时会运行一次。普通代码块在每个对象创建时运行一次。</p><p>顺序：</p><p>父类：静态属性&#x2F;静态代码块–&gt;子类：静态属性&#x2F;静态代码块–&gt;</p><p>父类：成员属性&#x2F;成员代码块–&gt;父类：构造器</p><p>子类：成员属性&#x2F;成员代码块–&gt;子类：构造器</p><h4 id="5-Iterator迭代器"><a href="#5-Iterator迭代器" class="headerlink" title="5 Iterator迭代器"></a>5 Iterator迭代器</h4><ul><li><p>Fail-fast 一旦发现遍历的同时其他人来修改，则立即抛出异常。list会记录修改次数modCount；进入遍历时Iterator迭代器会记录它改变的次数expectedModCount，迭代的时候会用modCounth和expectedModCount比较，不同就会抛出异常。</p></li><li><p>Fail-Safe 发现遍历的同时其他人来修改，应当有对应的策略，例如牺牲一致性来让整个遍历运行完成。 它调用的时COWInterator迭代器，它迭代时会把要迭代的数据也由snapshot数组指向。但copyOnWritelist方法的add是复制一个新的数组，</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">es=Arrays。copyOf(es,len+<span class="number">1</span>);es[len]=e;所以迭代器迭代的数组和修改数据的数组不是同一个.</span><br></pre></td></tr></table></figure></li></ul><p> Fail-Fast 与 Fail-Safe</p><ul><li>ArrayList 是 fail-fast 的典型代表，遍历的同时不能修改，尽快失败</li><li>CopyOnWriteArrayList 是 fail-safe 的典型代表，遍历的同时可以修改，原理是读写分离</li></ul><h4 id="6-HashMap"><a href="#6-HashMap" class="headerlink" title="6 HashMap"></a>6 HashMap</h4><ul><li><p>1.7是数组加链表    - 1.8数组+（链表｜红黑树）</p></li><li><p>数组扩容是链表长度大于8或者元素个数超过容量大0.75时会扩容</p></li><li><p>当链表的长度大于8或者数组容量大于64时，会树化变成红黑树。红黑树一般来说是为了防止Dos攻击导致链表过长，性能下降。红黑树的查询速度是log2n，但由于红黑树是TreeNode节点占用空间比Node节点，所以如非必要还是用链表。</p></li><li><p>1.当扩容时如果拆分树了，且树元素个数&lt;&#x3D;6会退化链表。2.remove树节点时，当root节点、root.left,root.right,root.left.left有一个为null时，也会退化成链表</p></li><li><p>索引计算，首先计算对象的hashcode（），再调用hashmap的hash（）方法进行二次哈希。二次hash是为了分布更均匀最后与（capacity-1）进行与运算得到索引</p></li><li><p>put流程：</p><ul><li>1.HashMap是懒惰创建数组的，首次使用才创建数组。</li><li>2.计算索引（桶下标）</li><li>3.如果桶下表还没人占用，则创建Node返回</li><li>4如果桶下标已经被占用：<ul><li>是TreeNode走红黑树的添加或者更新逻辑</li><li>是普通的Node走链表的添加更新逻辑，如果链表长度超过树化值，走树化逻辑</li></ul></li><li>返回前检查容量是否超过阀值，一旦超过就扩容</li></ul></li><li><p>HashMap的key可以为null，其他不行</p></li></ul><h4 id="7线程池的7大核心参数"><a href="#7线程池的7大核心参数" class="headerlink" title="7线程池的7大核心参数"></a>7线程池的7大核心参数</h4><ol><li>corePoolSize 核心线程数目 - 池中会保留的最多线程数</li><li>maximumPoolSize 最大线程数目 - 核心线程+救急线程的最大数目</li><li>keepAliveTime 生存时间 - 救急线程的生存时间，生存时间内没有新任务，此线程资源会释放</li><li>unit 时间单位 - 救急线程的生存时间单位，如秒、毫秒等</li><li>workQueue - 当没有空闲核心线程时，新来任务会加入到此队列排队，队列满会创建救急线程执行任务</li><li>threadFactory 线程工厂 - 可以定制线程对象的创建，例如设置线程名字、是否是守护线程等</li><li>handler 拒绝策略 - 当所有线程都在繁忙，workQueue 也放满时，会触发拒绝策略<ol><li>抛异常 java.util.concurrent.ThreadPoolExecutor.AbortPolicy</li><li>由调用者执行任务 java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy</li><li>丢弃任务 java.util.concurrent.ThreadPoolExecutor.DiscardPolicy</li><li>丢弃最早排队任务 java.util.concurrent.ThreadPoolExecutor.DiscardOldestPolicy</li></ol></li></ol><p><img src="/Users/xiaoluyouqu/%E9%9D%A2%E8%AF%95/%E5%9B%BE%E7%89%87/6.png" alt="tu"></p><h4 id="8-wait-vs-sleep"><a href="#8-wait-vs-sleep" class="headerlink" title="8 wait vs sleep"></a>8 wait vs sleep</h4><p><strong>一个共同点，三个不同点</strong></p><p>共同点</p><ul><li>wait() ，wait(long) 和 sleep(long) 的效果都是让当前线程暂时放弃 CPU 的使用权，进入阻塞状态</li></ul><p>不同点</p><ul><li>方法归属不同<ul><li>sleep(long) 是 Thread 的静态方法</li><li>而 wait()，wait(long) 都是 Object 的成员方法，每个对象都有</li></ul></li><li>锁特性不同（重点）<ul><li>wait 方法的调用必须先获取 wait 对象的锁，而 sleep 则无此限制</li><li>wait 方法执行后会释放对象锁，允许其它线程获得该对象锁（我放弃 cpu，但你们还可以用）</li><li>而 sleep 如果在 synchronized 代码块中执行，并不会释放对象锁（我放弃 cpu，你们也用不了）</li></ul></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 面试题 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> java </tag>
+            
+            <tag> 面试题 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Java内存模型-JMM</title>
       <link href="/2022/08/03/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B-JMM/"/>
       <url>/2022/08/03/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B-JMM/</url>

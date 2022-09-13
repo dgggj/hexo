@@ -1,0 +1,403 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>day2用友 | 牧羊少年的代码之旅</title><meta name="keywords" content="java,面试题"><meta name="author" content="chy_lua"><meta name="copyright" content="chy_lua"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="1死锁 不同的线程分别占用对方需要的资源不放弃，都在等待对方放弃自己需要的同步资源形成线程的死锁 死锁后，不会出现异常，不会出现提示，所有的线程都处于阻塞状态，无法继续  代码： 12345678910111213141516171819202122232425262728293031323334353637public class ThreadTest&amp;#123;  public static">
+<meta property="og:type" content="article">
+<meta property="og:title" content="day2用友">
+<meta property="og:url" content="https://dgggj.github.io/2022/09/13/day2%E7%94%A8%E5%8F%8B/index.html">
+<meta property="og:site_name" content="牧羊少年的代码之旅">
+<meta property="og:description" content="1死锁 不同的线程分别占用对方需要的资源不放弃，都在等待对方放弃自己需要的同步资源形成线程的死锁 死锁后，不会出现异常，不会出现提示，所有的线程都处于阻塞状态，无法继续  代码： 12345678910111213141516171819202122232425262728293031323334353637public class ThreadTest&amp;#123;  public static">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/a2.jpg">
+<meta property="article:published_time" content="2022-09-13T14:33:27.000Z">
+<meta property="article:modified_time" content="2022-09-13T14:39:15.279Z">
+<meta property="article:author" content="chy_lua">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="面试题">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/a2.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://dgggj.github.io/2022/09/13/day2%E7%94%A8%E5%8F%8B/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'day2用友',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-09-13 22:39:15'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="https://csdn.jsdeliver.net/gh/constown/HexoCustomFile@0.0.4/dist/css/custom.min.css"><meta name="generator" content="Hexo 6.1.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/touxiang.jpeg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">15</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友人帐</span></a></li><li><a class="site-page child" href="/share/"><i class="fa-fw fas fa-share"></i><span> 分享</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/messageboard/"><i class="fa-fw fas fa-comment-dots"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user-tag"></i><span> 关于作者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/a2.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">牧羊少年的代码之旅</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fa fa-link"></i><span> 友人帐</span></a></li><li><a class="site-page child" href="/share/"><i class="fa-fw fas fa-share"></i><span> 分享</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/messageboard/"><i class="fa-fw fas fa-comment-dots"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user-tag"></i><span> 关于作者</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">day2用友</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-09-13T14:33:27.000Z" title="发表于 2022-09-13 22:33:27">2022-09-13</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-09-13T14:39:15.279Z" title="更新于 2022-09-13 22:39:15">2022-09-13</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%9D%A2%E8%AF%95%E9%A2%98/">面试题</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.3k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>4分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="day2用友"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h4 id="1死锁"><a href="#1死锁" class="headerlink" title="1死锁"></a>1死锁</h4><ul>
+<li>不同的线程分别占用对方需要的资源不放弃，都在等待对方放弃自己需要的同步资源形成线程的死锁</li>
+<li>死锁后，不会出现异常，不会出现提示，所有的线程都处于阻塞状态，无法继续</li>
+</ul>
+<p>代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ThreadTest</span>&#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span>&#123;</span><br><span class="line">    StringBuffer s1=<span class="keyword">new</span> <span class="title class_">StringBuffer</span>();</span><br><span class="line">    StringBuffer s2=<span class="keyword">new</span> <span class="title class_">StringBuffer</span>();</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">Thread</span>(()-&gt;&#123;</span><br><span class="line">      <span class="keyword">synchronized</span>(s1)&#123;</span><br><span class="line">        s1.append(<span class="string">&quot;a&quot;</span>);</span><br><span class="line">        s2.append(<span class="string">&quot;1&quot;</span>);</span><br><span class="line">        <span class="keyword">try</span>&#123;</span><br><span class="line">          Thread.sleep(<span class="number">100</span>);</span><br><span class="line">        &#125;<span class="keyword">catch</span>(InterruptedException e)&#123;</span><br><span class="line">          e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">synchronized</span>(s2)&#123;</span><br><span class="line">          s1.append(<span class="string">&quot;2&quot;</span>);</span><br><span class="line">          s2.append(<span class="string">&quot;b&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,<span class="string">&quot;t1&quot;</span>).start();</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">Thread</span>(()-&gt;&#123;</span><br><span class="line">      <span class="keyword">synchronized</span>(s2)&#123;</span><br><span class="line">        s1.append(<span class="string">&quot;c&quot;</span>);</span><br><span class="line">        s2.append(<span class="string">&quot;3&quot;</span>);</span><br><span class="line">        <span class="keyword">try</span>&#123;</span><br><span class="line">          Thread.sleep(<span class="number">100</span>);</span><br><span class="line">        &#125;<span class="keyword">catch</span>(InterruptedException e)&#123;</span><br><span class="line">          e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">synchronized</span>(s1)&#123;</span><br><span class="line">          s1.append(<span class="string">&quot;c&quot;</span>);</span><br><span class="line">          s2.append(<span class="string">&quot;d&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,<span class="string">&quot;t1&quot;</span>).start();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>解决方法<ul>
+<li>尽可能减少嵌套</li>
+<li>减少同步资源的定义</li>
+</ul>
+</li>
+</ul>
+<h4 id="2线程状态"><a href="#2线程状态" class="headerlink" title="2线程状态"></a>2线程状态</h4><p><a target="_blank" rel="noopener" href="https://huyulong.cn/2022/07/12/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%85%AD%E7%A7%8D%E7%8A%B6%E6%80%81%EF%BC%88java%EF%BC%89/">六种线程状态</a></p>
+<h4 id="3Linux"><a href="#3Linux" class="headerlink" title="3Linux"></a>3Linux</h4><p><a target="_blank" rel="noopener" href="https://huyulong.cn/2022/04/05/linux%E5%91%BD%E4%BB%A4/">Linux</a></p>
+<h4 id="4select、poll、epoll"><a href="#4select、poll、epoll" class="headerlink" title="4select、poll、epoll"></a>4select、poll、epoll</h4><p>IO多路复用</p>
+<h4 id="5TCP三次握手、四次挥手"><a href="#5TCP三次握手、四次挥手" class="headerlink" title="5TCP三次握手、四次挥手"></a>5TCP三次握手、四次挥手</h4><p><a target="_blank" rel="noopener" href="https://huyulong.cn/2022/04/06/%E8%AE%A1%E7%AE%97%E6%9C%BA%E4%B8%8E%E7%BD%91%E7%BB%9C-%E6%80%BB%E7%BB%93/">三次握手、四次挥手</a></p>
+<h4 id="6TCP可靠传输"><a href="#6TCP可靠传输" class="headerlink" title="6TCP可靠传输"></a>6TCP可靠传输</h4><ul>
+<li>校验和：<ul>
+<li>发送方：在发送数据之前计算校验和，并进行校验和的填充</li>
+<li>接收方：在收到数据后，对数据以同样的方式进行计算，求出 校验和，与发送方的进行比对</li>
+</ul>
+</li>
+<li>序列号和确认应答:tcp传输时将每个字节的数据都进行了编号，就是序列号，Ack报文中就带有对应的确认序列号，告诉发送方，接到哪些数据，下一次的数据应该从哪里发。序列号作用：1.应答2.将接收到的数据按照序列号排序，3去掉序列号重复的数据</li>
+<li>超时重传：解决发送方发送完数据，没有接收到ACK报文的问题。就是等待一段时间，如果没有收到Ack报文，就重新发送</li>
+<li>连接管理：三次握手四次挥手</li>
+<li>流量控制：Tcp可以根据接受端对数据处理能力，决定发送端的发送速度，这个机制就是流量控制</li>
+<li>拥塞控制：引入慢启动机制，在开始发送数据时，先发送少量的数据探路，探清当前的网络状态如何，再决定多大的速度进行传输。引入拥塞窗口，刚开始为1；呈指数增长。设置一个拥塞窗口的阈值，当达到阈值，增长按照线性增长。当网络拥塞时，设置拥塞阈值为网络拥塞时的一半，并且把拥塞窗口设置为1.</li>
+</ul>
+<p>校验和的计算方式：在数据传输的过程中，将发送的数据段当作一个16位整数，把这些整数加起来，进位再和得到的数相加，最后取反，得到校验和。</p>
+<p><img src="/Users/xiaoluyouqu/%E9%9D%A2%E8%AF%95/%E5%9B%BE%E7%89%87/tcp.png" alt="tcp"></p>
+<h4 id="10二叉树的遍历方式"><a href="#10二叉树的遍历方式" class="headerlink" title="10二叉树的遍历方式"></a>10二叉树的遍历方式</h4><ul>
+<li>前序遍历</li>
+<li>中序遍历</li>
+<li>后序遍历</li>
+<li>层次遍历</li>
+</ul>
+<h4 id="11平衡二叉树"><a href="#11平衡二叉树" class="headerlink" title="11平衡二叉树"></a>11平衡二叉树</h4><p>对于<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91&spm=1001.2101.3001.7020">二叉查找树</a>，尽管查找、插入及删除操作的平均运行时间为O(logn)，但是它们的最差运行时间都是O(n),原因在于对树的形状没有限制。</p>
+<p><a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91&spm=1001.2101.3001.7020">平衡二叉树</a>又称为AVL树，它或者是一棵空树，或者是有下列性质的二叉树：它的左子树和右子树都是平衡二叉树，且左右子树的深度之差的绝对值不超过1。二叉树的的平衡因子BF为：该结点的左子树的深度减去它的右子树的深度，则平衡二叉树的所有结点的平衡因子为只可能是：-1、0和1</p>
+<p>一棵好的平衡二叉树的特征：</p>
+<p>（1）保证有n个结点的树的高度为O(logn)</p>
+<p>（2）容易维护，也就是说，在做数据项的插入或删除操作时，为平衡树所做的一些辅助操作时间开销为O(1)</p>
+<p>一、平衡二叉树的构造</p>
+<p>在一棵二叉查找树中插入结点后，调整其为平衡二叉树。若向平衡二叉树中插入一个新结点后破坏了平衡二叉树的平衡性。首先要找出插入新结点后失去平衡的最小子树根结点的指针。然后再调整这个子树中有关结点之间的链接关系，使之成为新的平衡子树。当失去平衡的最小子树被调整为平衡子树后，原有其他所有不平衡子树无需调整，整个二叉排序树就又成为一棵平衡二叉树</p>
+<p>1.调整方法</p>
+<p>（1）插入点位置必须满足二叉查找树的性质，即任意一棵子树的左结点都小于根结点，右结点大于根结点</p>
+<p>（2）找出插入结点后****不平衡的最小二叉树****进行调整，如果是整个树不平衡，才进行整个树的调整。</p>
+<h4 id="12JVM类加载过程"><a href="#12JVM类加载过程" class="headerlink" title="12JVM类加载过程"></a>12JVM类加载过程</h4><p><a target="_blank" rel="noopener" href="https://huyulong.cn/2022/04/07/JVM-02%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/">类加载过程</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">chy_lua</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://dgggj.github.io/2022/09/13/day2%E7%94%A8%E5%8F%8B/">https://dgggj.github.io/2022/09/13/day2%E7%94%A8%E5%8F%8B/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://dgggj.github.io" target="_blank">牧羊少年的代码之旅</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/java/">java</a><a class="post-meta__tags" href="/tags/%E9%9D%A2%E8%AF%95%E9%A2%98/">面试题</a></div><div class="post_share"><div class="social-share" data-image="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/a2.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button"><i class="fas fa-qrcode"></i> 打赏</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/reward/weixin.jpeg" target="_blank"><img class="post-qr-code-img" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/reward/weixin.jpeg" alt="wechat"/></a><div class="post-qr-code-desc">wechat</div></li><li class="reward-item"><a href="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/reward/zhifubao.jpeg" target="_blank"><img class="post-qr-code-img" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/reward/zhifubao.jpeg" alt="alipay"/></a><div class="post-qr-code-desc">alipay</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2022/09/08/%E9%9D%A2%E8%AF%951/"><img class="next-cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/a5.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">面试1</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/08/03/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B-JMM/" title="Java内存模型-JMM"><img class="cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/a15.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-08-03</div><div class="title">Java内存模型-JMM</div></div></a></div><div><a href="/2022/07/12/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%85%AD%E7%A7%8D%E7%8A%B6%E6%80%81%EF%BC%88java%EF%BC%89/" title="线程的六种状态（java）"><img class="cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/a10.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-07-12</div><div class="title">线程的六种状态（java）</div></div></a></div><div><a href="/2022/09/08/%E9%9D%A2%E8%AF%951/" title="面试1"><img class="cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/a5.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-09-08</div><div class="title">面试1</div></div></a></div><div><a href="/2022/07/27/23%E7%A7%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" title="23种设计模式"><img class="cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/a9.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-07-27</div><div class="title">23种设计模式</div></div></a></div><div><a href="/2022/04/08/JVM-03%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/" title="JVM_03运行时数据区"><img class="cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover4.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-08</div><div class="title">JVM_03运行时数据区</div></div></a></div><div><a href="/2022/04/07/JVM-02%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%AD%90%E7%B3%BB%E7%BB%9F/" title="JVM_02类加载子系统"><img class="cover" src="https://blog-chy-lua.oss-cn-shanghai.aliyuncs.com/images/cover3.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-07</div><div class="title">JVM_02类加载子系统</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E6%AD%BB%E9%94%81"><span class="toc-text">1死锁</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81"><span class="toc-text">2线程状态</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3Linux"><span class="toc-text">3Linux</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4select%E3%80%81poll%E3%80%81epoll"><span class="toc-text">4select、poll、epoll</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E3%80%81%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B"><span class="toc-text">5TCP三次握手、四次挥手</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6TCP%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93"><span class="toc-text">6TCP可靠传输</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#10%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E9%81%8D%E5%8E%86%E6%96%B9%E5%BC%8F"><span class="toc-text">10二叉树的遍历方式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#11%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91"><span class="toc-text">11平衡二叉树</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#12JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B"><span class="toc-text">12JVM类加载过程</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By chy_lua</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">本地搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><script src="/js/search/local-search.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'D3Y3VWy1E6v4DoAxLrzURxcJ-gzGzoHsz',
+      appKey: 'uhb7m9SRGYt3VOuoNbD2HSzC',
+      avatar: 'monsterid',
+      serverURLs: 'https://d3y3vwy1.lc-cn-n1-shared.com',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script src="https://cdn.jsdelivr.net/npm/blueimp-md5/js/md5.min.js"></script><script>window.addEventListener('load', () => {
+  const changeContent = (content) => {
+    if (content === '') return content
+
+    content = content.replace(/<img.*?src="(.*?)"?[^\>]+>/ig, '[图片]') // replace image link
+    content = content.replace(/<a[^>]+?href=["']?([^"']+)["']?[^>]*>([^<]+)<\/a>/gi, '[链接]') // replace url
+    content = content.replace(/<pre><code>.*?<\/pre>/gi, '[代码]') // replace code
+    content = content.replace(/<[^>]+>/g,"") // remove html tag
+
+    if (content.length > 150) {
+      content = content.substring(0,150) + '...'
+    }
+    return content
+  }
+
+  const getIcon = (icon, mail) => {
+    if (icon) return icon
+    let defaultIcon = '?d=monsterid'
+    let iconUrl = `https://gravatar.loli.net/avatar/${md5(mail.toLowerCase()) + defaultIcon}`
+    return iconUrl
+  }
+
+  const generateHtml = array => {
+    let result = ''
+
+    if (array.length) {
+      for (let i = 0; i < array.length; i++) {
+        result += '<div class=\'aside-list-item\'>'
+
+        if (true) {
+          const name = 'src'
+          result += `<a href='${array[i].url}' class='thumbnail'><img ${name}='${array[i].avatar}' alt='${array[i].nick}'></a>`
+        }
+
+        result += `<div class='content'>
+        <a class='comment' href='${array[i].url}' title='${array[i].content}'>${array[i].content}</a>
+        <div class='name'><span>${array[i].nick} / </span><time datetime="${array[i].date}">${btf.diffDate(array[i].date, true)}</time></div>
+        </div></div>`
+      }
+    } else {
+      result += '没有评论'
+    }
+
+    let $dom = document.querySelector('#card-newest-comments .aside-list')
+    $dom.innerHTML= result
+    window.lazyLoadInstance && window.lazyLoadInstance.update()
+    window.pjax && window.pjax.refresh($dom)
+  }
+
+  const getComment = () => {
+    const serverURL = 'https://d3y3vwy1.lc-cn-n1-shared.com'
+
+    var settings = {
+      "method": "GET",
+      "headers": {
+        "X-LC-Id": 'D3Y3VWy1E6v4DoAxLrzURxcJ-gzGzoHsz',
+        "X-LC-Key": 'uhb7m9SRGYt3VOuoNbD2HSzC',
+        "Content-Type": "application/json"
+      },
+    }
+
+    fetch(`${serverURL}/1.1/classes/Comment?limit=6&order=-createdAt`,settings)
+      .then(response => response.json())
+      .then(data => {
+        const valineArray = data.results.map(function (e) {
+          return {
+            'avatar': getIcon(e.QQAvatar, e.mail),
+            'content': changeContent(e.comment),
+            'nick': e.nick,
+            'url': e.url + '#' + e.objectId,
+            'date': e.updatedAt,
+          }
+        })
+        saveToLocal.set('valine-newest-comments', JSON.stringify(valineArray), 10/(60*24))
+        generateHtml(valineArray)
+      }).catch(e => {
+        const $dom = document.querySelector('#card-newest-comments .aside-list')
+        $dom.innerHTML= "无法获取评论，请确认相关配置是否正确"
+      }) 
+  }
+
+  const newestCommentInit = () => {
+    if (document.querySelector('#card-newest-comments .aside-list')) {
+      const data = saveToLocal.get('valine-newest-comments')
+      if (data) {
+        generateHtml(JSON.parse(data))
+      } else {
+        getComment()
+      }
+    }
+  }
+
+  newestCommentInit()
+  document.addEventListener('pjax:complete', newestCommentInit)
+})</script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  typeof preloader === 'object' && preloader.initLoading()
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+
+  typeof preloader === 'object' && preloader.endLoading()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
